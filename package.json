@@ -64,7 +64,10 @@
 		"build": "next build",
 		"dev": "next dev",
 		"format": "biome format --write",
-		"lint": "biome check",
+		"format:check": "biome format .",
+		"lint": "biome check .",
+		"lint:fix": "biome check --write .",
+		"prepare": "husky",
 		"start": "next start"
 	},
 	"version": "0.1.0"
