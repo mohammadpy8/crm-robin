@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+if git rev-parse --verify HEAD >/dev/null 2>&1; then
+  echo "$(date): $(git config user.name) - Commit attempt" >> .git/commit-log.txt
+fi
+
+npx lint-staged

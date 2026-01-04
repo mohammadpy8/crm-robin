@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+
+if [ -n "$HUSKY_SKIP_HOOKS" ]; then
+  echo "⛔ Bypassing commit hooks is not allowed!"
+  echo "❌ Please commit without --no-verify flag"
+  exit 1
+fi
+
+echo "📝 Validating commit message..."
+
+npx --no -- commitlint --edit $1
+
+echo "✅ Commit message validated successfully!"

@@ -1,0 +1,24 @@
+#!/usr/bin/env sh
+
+COMMIT_MSG_FILE=$1
+COMMIT_SOURCE=$2
+
+if [ -z "$COMMIT_SOURCE" ]; then
+  cat > "$COMMIT_MSG_FILE" << EOF
+# type(scope): Subject starts with capital letter
+#
+# Types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
+# Scope: optional (ui, auth, api, etc.)
+#
+# Examples:
+#   feat(auth): Add OAuth integration
+#   fix(ui): Resolve responsive issue
+#   docs: Update installation guide
+#
+# Rules:
+#   - Subject: 5-72 characters, English only
+#   - Start with capital letter
+#   - No period at the end
+#   - No Persian characters
+EOF
+fi

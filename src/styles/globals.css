@@ -1,0 +1,12 @@
+/** biome-ignore-all lint/correctness/noInvalidPositionAtImportRule: <> */
+/** biome-ignore-all lint/correctness/noUnknownProperty: <> */
+
+@import "tailwindcss";
+
+@plugin "../../hero.ts";
+@plugin "@tailwindcss/forms" {
+	strategy: "base";
+	strategy: "class";
+}
+
+@source "../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}";

@@ -1,0 +1,40 @@
+#!/usr/bin/env sh
+
+echo "🔍 Checking commits before push..."
+
+COMMIT_COUNT=$(git rev-list --count HEAD 2>/dev/null || echo "0")
+
+if [ "$COMMIT_COUNT" -eq "0" ]; then
+  echo "⚠️  No commits to validate"
+  exit 0
+fi
+
+if [ "$COMMIT_COUNT" -lt "10" ]; then
+  FROM_COMMIT="HEAD~$COMMIT_COUNT"
+else
+  FROM_COMMIT="HEAD~10"
+fi
+
+REMOTE_BRANCH=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null)
+
+if [ -n "$REMOTE_BRANCH" ]; then
+  echo "📝 Validating new commits..."
+  npx commitlint --from="$REMOTE_BRANCH" --to=HEAD --verbose
+else
+  echo "📝 Validating all commits..."
+  npx commitlint --from="$FROM_COMMIT" --to=HEAD --verbose
+fi
+
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "❌ Found invalid commit messages!"
+  echo "⛔ Push rejected."
+  echo ""
+  echo "💡 Fix invalid commits:"
+  echo "   git rebase -i HEAD~$COMMIT_COUNT"
+  echo "   # Use 'reword' to fix commit messages"
+  echo ""
+  exit 1
+fi
+
+echo "✅ All commit messages are valid!"

@@ -1,0 +1,167 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.2.0/schema.json",
+	"assist": {
+		"actions": {
+			"source": {
+				"organizeImports": "on",
+				"useSortedAttributes": "on",
+				"useSortedKeys": "on",
+				"useSortedProperties": "on"
+			}
+		}
+	},
+	"files": {
+		"ignoreUnknown": true,
+		"includes": ["**", "!node_modules", "!.next", "!dist", "!build", "!.turbo"]
+	},
+	"formatter": {
+		"attributePosition": "auto",
+		"enabled": true,
+		"formatWithErrors": true,
+		"indentStyle": "tab",
+		"indentWidth": 2,
+		"lineEnding": "lf",
+
+		"lineWidth": 90
+	},
+	"linter": {
+		"domains": {
+			"next": "recommended",
+			"react": "recommended"
+		},
+		"enabled": true,
+		"rules": {
+			"a11y": {
+				"noAccessKey": "error",
+				"useAltText": "error",
+				"useButtonType": "warn",
+				"useHtmlLang": "error"
+			},
+			"complexity": {
+				"noAdjacentSpacesInRegex": "error",
+				"noBannedTypes": "error",
+				"noEmptyTypeParameters": "error",
+				"noExcessiveCognitiveComplexity": "warn",
+				"noExtraBooleanCast": "error",
+				"noUselessCatch": "error",
+				"noUselessContinue": "error",
+				"noUselessEmptyExport": "error",
+				"noUselessFragments": "error",
+				"noUselessStringConcat": "error",
+				"noUselessSwitchCase": "error",
+				"noUselessTypeConstraint": "error",
+				"useArrowFunction": "error",
+				"useOptionalChain": "warn"
+			},
+			"correctness": {
+				"noChildrenProp": "error",
+				"noConstAssign": "error",
+				"noConstantCondition": "error",
+				"noEmptyCharacterClassInRegex": "error",
+				"noEmptyPattern": "error",
+				"noInvalidUseBeforeDeclaration": "error",
+				"noNestedComponentDefinitions": "error",
+				"noNodejsModules": "info",
+				"noPrecisionLoss": "warn",
+				"noReactPropAssignments": "error",
+				"noSelfAssign": "error",
+				"noUnusedFunctionParameters": "error",
+				"noUnusedImports": "error",
+				"noUnusedVariables": "error",
+				"useExhaustiveDependencies": "warn",
+				"useHookAtTopLevel": "error",
+				"useIsNan": "error",
+				"useJsonImportAttributes": "error",
+				"useJsxKeyInIterable": "error",
+				"useSingleJsDocAsterisk": "warn",
+				"useValidForDirection": "error",
+				"useValidTypeof": "error"
+			},
+			"nursery": {
+				"noImportCycles": "error",
+				"noNextAsyncClientComponent": "error",
+				"noShadow": "error",
+				"noUnnecessaryConditions": "warn",
+				"noUselessUndefined": "error",
+				"useAnchorHref": "error",
+				"useImageSize": "warn",
+				"useMaxParams": {
+					"level": "error",
+					"options": { "max": 5 }
+				},
+				"useReactFunctionComponents": "error",
+				"useSortedClasses": {
+					"fix": "safe",
+					"level": "error",
+					"options": {}
+				}
+			},
+			"performance": {
+				"noAwaitInLoops": "error",
+				"noImgElement": "error"
+			},
+			"recommended": true,
+			"security": {
+				"noGlobalEval": "error"
+			},
+			"style": {
+				"noImplicitBoolean": "warn",
+				"noNegationElse": "warn",
+				"noNestedTernary": "warn",
+				"noParameterAssign": "error",
+				"noYodaExpression": "warn",
+				"useArrayLiterals": "warn",
+				"useBlockStatements": "warn",
+				"useConst": "info",
+				"useDefaultParameterLast": "error",
+				"useDefaultSwitchClause": "error",
+				"useEnumInitializers": "error",
+				"useExportType": "error",
+				"useImportType": "error",
+				"useNumericSeparators": "error",
+				"useShorthandAssign": "warn",
+				"useShorthandFunctionType": "error",
+				"useSingleVarDeclarator": "error"
+			},
+			"suspicious": {
+				"noAlert": "error",
+				"noCatchAssign": "error",
+				"noCommentText": "error",
+				"noConfusingVoidType": "error",
+				"noConsole": "error",
+				"noConstEnum": "error",
+				"noDebugger": "error",
+				"noDocumentCookie": "error",
+				"noDoubleEquals": "error",
+				"noDuplicateCase": "error",
+				"noDuplicateElseIf": "error",
+				"noDuplicateJsxProps": "error",
+				"noDuplicateObjectKeys": "error",
+				"noDuplicateParameters": "error",
+				"noEmptyBlockStatements": "error",
+				"noEmptyInterface": "error",
+				"noExplicitAny": "error",
+				"noExtraNonNullAssertion": "error",
+				"noFunctionAssign": "error",
+				"noGlobalAssign": "error",
+				"noImportAssign": "error",
+				"noLabelVar": "error",
+				"noRedeclare": "error",
+				"noRedundantUseStrict": "error",
+				"noSelfCompare": "error",
+				"noShadowRestrictedNames": "error",
+				"noTsIgnore": "error",
+				"noUnknownAtRules": "off",
+				"noVar": "error",
+				"useAwait": "error",
+				"useErrorMessage": "error",
+				"useIterableCallbackReturn": "warn"
+			}
+		}
+	},
+	"vcs": {
+		"clientKind": "git",
+		"enabled": true,
+		"useIgnoreFile": true
+	}
+}
