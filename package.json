@@ -55,6 +55,7 @@
 		"@types/react-dom": "^19",
 		"babel-plugin-react-compiler": "1.0.0",
 		"husky": "^9.1.7",
+		"plop": "^4.0.4",
 		"tailwindcss": "^4",
 		"typescript": "^5"
 	},
@@ -70,6 +71,7 @@
 		"dev": "next dev",
 		"format": "biome format --write",
 		"format:check": "biome format .",
+		"gen:icon": "plop icon",
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
 		"prepare": "husky",
