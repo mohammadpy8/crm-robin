@@ -2,6 +2,7 @@
 /** biome-ignore-all lint/correctness/noUnknownProperty: <> */
 
 @import "tailwindcss";
+@import "./themes.css";
 
 @plugin "../../hero.ts";
 @plugin "@tailwindcss/forms" {

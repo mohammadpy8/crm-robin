@@ -9,7 +9,7 @@ module.exports = (plop) => {
 			{
 				path: "src/icons/index.ts",
 				template:
-					'export { default as {{pascalCase name}} } from "./Icons/{{pascalCase name}}";',
+					'export { default as {{pascalCase name}} } from "./path/{{pascalCase name}}";',
 				type: "append",
 			},
 		],
