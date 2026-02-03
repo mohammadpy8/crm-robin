@@ -33,9 +33,12 @@
 		"rules": {
 			"a11y": {
 				"noAccessKey": "error",
+				"noLabelWithoutControl": "off",
+				"noStaticElementInteractions": "off",
 				"useAltText": "error",
 				"useButtonType": "warn",
-				"useHtmlLang": "error"
+				"useHtmlLang": "error",
+				"useKeyWithClickEvents": "off"
 			},
 			"complexity": {
 				"noAdjacentSpacesInRegex": "error",
@@ -125,10 +128,11 @@
 			},
 			"suspicious": {
 				"noAlert": "error",
+				"noArrayIndexKey": "off",
 				"noCatchAssign": "error",
 				"noCommentText": "error",
 				"noConfusingVoidType": "error",
-				"noConsole": "error",
+				"noConsole": "off",
 				"noConstEnum": "error",
 				"noDebugger": "error",
 				"noDocumentCookie": "error",

@@ -3,7 +3,6 @@ import type { loginSchema } from "../schemas/login.schema";
 
 export type LoginFormData = z.infer<typeof loginSchema>;
 
-
 export interface LoginResponse {
 	token: string;
 	user: {
