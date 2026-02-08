@@ -10,7 +10,7 @@ import type { TableRow } from "../../types";
 interface TableHeaderProps {
 	headerGroups: HeaderGroup<TableRow>[];
 	columnWidths: number[];
-	headerScrollRef: RefObject<HTMLDivElement>;
+	headerScrollRef: RefObject<HTMLDivElement | null>;
 	multiSelect: boolean;
 	allRowsSelected: boolean;
 	someRowsSelected: boolean;

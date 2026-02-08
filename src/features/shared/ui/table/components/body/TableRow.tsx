@@ -3,11 +3,12 @@
 import { Checkbox } from "@heroui/react";
 import { Edit, Eye } from "@/icons";
 import type { ColumnConfig, TableRow as TableRowType } from "../../types";
+import type { ColumnDef } from "@tanstack/react-table";
 
 interface TableRowProps {
 	row: TableRowType;
 	isSelected: boolean;
-	columns: Array<{ id: string; accessorKey?: string; size?: number }>;
+	columns: ColumnDef<TableRowType>[];
 	columnConfigs: ColumnConfig[];
 	columnWidths: number[];
 	onRowSelection: (checked: boolean) => void;
@@ -61,7 +62,7 @@ export const TableRow = ({
 									</button>
 								</div>
 							</div>
-						) : column.accessorKey ? (
+						) : "accessorKey" in column && column.accessorKey ? (
 							(() => {
 								const config = columnConfigs[colIndex - 1];
 								const value = row[column.accessorKey as keyof TableRowType];

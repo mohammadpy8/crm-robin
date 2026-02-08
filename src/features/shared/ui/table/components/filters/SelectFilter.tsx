@@ -67,7 +67,7 @@ export const SelectFilter = ({
 					/>
 				</div>
 			</PopoverTrigger>
-			<PopoverContent className="w-[200px] p-0">
+			<PopoverContent className="w-50 p-0">
 				<div className="flex flex-col">
 					<div className="border-b p-2">
 						<input

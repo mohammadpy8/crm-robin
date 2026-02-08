@@ -3,8 +3,8 @@
 import { useEffect, type RefObject } from "react";
 
 export const useSyncScroll = (
-	headerRef: RefObject<HTMLDivElement>,
-	bodyRef: RefObject<HTMLDivElement>,
+	headerRef: RefObject<HTMLDivElement | null>,
+	bodyRef: RefObject<HTMLDivElement | null>,
 ) => {
 	useEffect(() => {
 		const bodyScroll = bodyRef.current;

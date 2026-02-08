@@ -2,17 +2,18 @@
 
 import type { RefObject } from "react";
 import type { ColumnConfig, TableRow as TableRowType } from "../../types";
+import type { ColumnDef } from "@tanstack/react-table";
 import { TableRow } from "./TableRow";
 
 interface TableBodyProps {
 	data: TableRowType[];
-	columns: Array<{ id: string; accessorKey?: string; size?: number }>;
+	columns: ColumnDef<TableRowType>[];
 	columnConfigs: ColumnConfig[];
 	columnWidths: number[];
 	rowSelection: Record<string, boolean>;
 	currentPage: number;
 	itemsPerPage: number;
-	scrollContainerRef: RefObject<HTMLDivElement>;
+	scrollContainerRef: RefObject<HTMLDivElement | null>;
 	onRowSelection: (index: number, checked: boolean) => void;
 	onRowView?: (row: TableRowType) => void;
 	onRowEdit?: (row: TableRowType) => void;
