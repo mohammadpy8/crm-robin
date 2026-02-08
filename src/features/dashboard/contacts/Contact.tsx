@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Menu, Plus } from "lucide-react";
+import { ChevronDown, Kanban, Menu, Plus } from "lucide-react";
 import { Delete, Organization, Send } from "@/icons";
 import Update from "@/icons/path/Update";
 import {
@@ -142,7 +142,7 @@ const ContactsPage = () => {
 				active: false,
 				disabled: true,
 				href: "/contacts/kanban",
-				icon: <Menu className="h-4 w-4" />,
+				icon: <Kanban className="h-4 w-4" />,
 				id: "kanban",
 				label: "نمایش کاریز",
 			},

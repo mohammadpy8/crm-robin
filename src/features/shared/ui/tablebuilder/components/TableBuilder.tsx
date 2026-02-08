@@ -1,12 +1,19 @@
+/** biome-ignore-all lint/style/noNestedTernary: <explanation> */
 "use client";
 
-import { Pagination } from "@heroui/react";
+import {
+	Checkbox,
+	Pagination,
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+	Spinner,
+} from "@heroui/react";
 import {
 	type ColumnDef,
 	type ColumnFiltersState,
 	flexRender,
 	getCoreRowModel,
-	getSortedRowModel,
 	type SortingState,
 	useReactTable,
 } from "@tanstack/react-table";
@@ -14,10 +21,13 @@ import { ArrowDown, ArrowUp, ArrowUpDown, Search, X } from "lucide-react";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
-import { createPortal } from "react-dom";
 import type { DateObject } from "react-multi-date-picker";
 import DatePicker from "react-multi-date-picker";
 import { Edit, Eye } from "@/icons";
+
+// ============================================================================
+// Types & Interfaces
+// ============================================================================
 
 interface TableRow {
 	date: string;
@@ -52,21 +62,110 @@ interface ColumnConfig {
 	sortableFieldName?: string;
 }
 
+type DateRange = [DateObject | null, DateObject | null] | null;
+type FilterValue = DateRange | string[] | string;
+
 interface TableBuilderProps {
 	columns: ColumnConfig[];
 	data: TableRow[];
 	itemsPerPage?: number;
-	onFilterChange?: (filters: Record<string, DateRange | string[] | string>) => void;
+	loading?: boolean;
+	multiSelect?: boolean;
+	onFilterChange?: (filters: Record<string, FilterValue>) => void;
+	onPageChange?: (page: number) => void;
 	onRowEdit?: (row: TableRow) => void;
 	onRowView?: (row: TableRow) => void;
 	onSelectionChange?: (selectedIds: number[]) => void;
 	onSortChange?: (sortField: string | null, sortOrder: "asc" | "desc" | null) => void;
+	totalItems?: number;
+	currentPage?: number;
 }
 
 interface SortIconProps {
 	isSorted: "asc" | "desc" | false;
 	onClick: () => void;
 }
+
+interface TextFilterProps {
+	onChange: (value: string) => void;
+	onEnter: () => void;
+	placeholder: string;
+	value: string;
+}
+
+interface SelectFilterProps {
+	multiSelect?: boolean;
+	onChange: (value: string[] | string) => void;
+	options: string[];
+	placeholder: string;
+	value: string[] | string;
+}
+
+interface DateRangeFilterProps {
+	onChange: (value: DateRange) => void;
+	placeholder: string;
+	value: DateRange;
+}
+
+interface TableHeaderCellProps {
+	config: ColumnConfig;
+	currentSort: "asc" | "desc" | false;
+	filterValue: FilterValue;
+	onApplyFilters: () => void;
+	onFilterChange: (value: FilterValue) => void;
+	onSort: () => void;
+}
+
+// ============================================================================
+// Hooks
+// ============================================================================
+
+const useFilterState = () => {
+	const filterInputsRef = useRef<Record<string, FilterValue>>({});
+	const [, forceUpdate] = useState({});
+
+	const setFilter = useCallback((columnId: string, value: FilterValue) => {
+		filterInputsRef.current[columnId] = value;
+		forceUpdate({});
+	}, []);
+
+	const getFilter = useCallback((columnId: string): FilterValue => {
+		return filterInputsRef.current[columnId];
+	}, []);
+
+	const clearFilters = useCallback(() => {
+		filterInputsRef.current = {};
+		forceUpdate({});
+	}, []);
+
+	return { clearFilters, filters: filterInputsRef.current, getFilter, setFilter };
+};
+
+const useSyncScroll = (
+	headerRef: React.RefObject<HTMLDivElement>,
+	bodyRef: React.RefObject<HTMLDivElement>,
+) => {
+	useEffect(() => {
+		const bodyScroll = bodyRef.current;
+		const headerScroll = headerRef.current;
+
+		if (!bodyScroll || !headerScroll) return;
+
+		const handleBodyScroll = (): void => {
+			headerScroll.scrollLeft = bodyScroll.scrollLeft;
+		};
+
+		bodyScroll.addEventListener("scroll", handleBodyScroll, { passive: true });
+
+		return () => {
+			bodyScroll.removeEventListener("scroll", handleBodyScroll);
+		};
+	}, [headerRef, bodyRef]);
+};
+
+// ============================================================================
+// UI Components
+// ============================================================================
 
 const SortIcon = ({ isSorted, onClick }: SortIconProps) => {
 	const renderIcon = () => {
@@ -94,13 +193,6 @@ const SortIcon = ({ isSorted, onClick }: SortIconProps) => {
 };
 
 SortIcon.displayName = "SortIcon";
-
-interface TextFilterProps {
-	onChange: (value: string) => void;
-	onEnter: () => void;
-	placeholder: string;
-	value: string;
-}
 
 const TextFilter = ({ onChange, onEnter, placeholder, value }: TextFilterProps) => {
 	const [localValue, setLocalValue] = useState(value);
@@ -135,14 +227,6 @@ const TextFilter = ({ onChange, onEnter, placeholder, value }: TextFilterProps) 
 
 TextFilter.displayName = "TextFilter";
 
-interface SelectFilterProps {
-	multiSelect?: boolean;
-	onChange: (value: string[] | string) => void;
-	options: string[];
-	placeholder: string;
-	value: string[] | string;
-}
-
 const SelectFilter = ({
 	multiSelect = false,
 	onChange,
@@ -150,37 +234,7 @@ const SelectFilter = ({
 	placeholder,
 	value,
 }: SelectFilterProps) => {
-	const [isOpen, setIsOpen] = useState(false);
 	const [searchTerm, setSearchTerm] = useState("");
-	const [dropdownPosition, setDropdownPosition] = useState({
-		left: 0,
-		top: 0,
-		width: 0,
-	});
-	const dropdownRef = useRef<HTMLDivElement>(null);
-	const inputRef = useRef<HTMLInputElement>(null);
-
-	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent): void => {
-			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-				setIsOpen(false);
-				setSearchTerm("");
-			}
-		};
-		document.addEventListener("mousedown", handleClickOutside);
-		return () => document.removeEventListener("mousedown", handleClickOutside);
-	}, []);
-
-	useEffect(() => {
-		if (isOpen && inputRef.current) {
-			const rect = inputRef.current.getBoundingClientRect();
-			setDropdownPosition({
-				left: rect.left,
-				top: rect.bottom + 4,
-				width: Math.max(rect.width, 200),
-			});
-		}
-	}, [isOpen]);
 
 	const handleSelect = useCallback(
 		(option: string): void => {
@@ -192,8 +246,6 @@ const SelectFilter = ({
 				onChange(newValues);
 			} else {
 				onChange(option);
-				setIsOpen(false);
-				setSearchTerm("");
 			}
 		},
 		[multiSelect, onChange, value],
@@ -213,218 +265,161 @@ const SelectFilter = ({
 		return options.filter((opt) => opt.toLowerCase().includes(searchTerm.toLowerCase()));
 	}, [options, searchTerm]);
 
-	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-		setSearchTerm(e.target.value);
-		if (!isOpen) {
-			setIsOpen(true);
-		}
-	};
+	return (
+		<Popover offset={10} placement="bottom" showArrow={true}>
+			<PopoverTrigger>
+				<div className="w-full cursor-pointer">
+					<input
+						className="w-full cursor-pointer border-none bg-transparent px-2 py-1 font-medium text-secondary text-xs placeholder:font-medium placeholder:text-secondary focus:outline-none focus:ring-0"
+						placeholder={placeholder}
+						readOnly={true}
+						type="text"
+						value={displayText}
+					/>
+				</div>
+			</PopoverTrigger>
+			<PopoverContent className="w-[200px] p-0">
+				<div className="flex flex-col">
+					<div className="border-b p-2">
+						<input
+							className="w-full rounded border border-gray-300 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+							onChange={(e) => setSearchTerm(e.target.value)}
+							placeholder="جستجو..."
+							type="text"
+							value={searchTerm}
+						/>
+					</div>
 
-	const dropdown = isOpen ? (
-		<div
-			className="fixed z-9999 max-h-48 overflow-y-auto rounded-lg border border-gray-300 bg-white shadow-lg"
-			ref={dropdownRef}
-			style={{
-				left: `${dropdownPosition.left}px`,
-				top: `${dropdownPosition.top}px`,
-				width: `${dropdownPosition.width}px`,
-			}}
-		>
-			{multiSelect && Array.isArray(value) && value.length > 0 && (
-				<button
-					className="sticky top-0 z-10 w-full border-b bg-white px-2 py-1.5 text-right text-red-600 text-xs hover:bg-gray-100"
-					onClick={() => {
-						onChange([]);
-						setSearchTerm("");
-					}}
-					type="button"
-				>
-					پاک کردن همه
-				</button>
-			)}
-			{filteredOptions.length > 0 ? (
-				filteredOptions.map((option) => {
-					const isSelected = multiSelect
-						? Array.isArray(value) && value.includes(option)
-						: value === option;
-					return (
+					{multiSelect && Array.isArray(value) && value.length > 0 && (
 						<button
-							className={`w-full px-2 py-1.5 text-right text-xs transition-colors hover:bg-gray-100 ${
-								isSelected ? "bg-primary/10 font-medium text-primary" : "text-gray-700"
-							}`}
-							key={option}
-							onClick={() => handleSelect(option)}
+							className="border-b px-2 py-1.5 text-right text-red-600 text-xs hover:bg-gray-100"
+							onClick={() => {
+								onChange([]);
+								setSearchTerm("");
+							}}
 							type="button"
 						>
-							{option}
+							پاک کردن همه
 						</button>
-					);
-				})
-			) : (
-				<div className="px-2 py-1.5 text-center text-gray-400 text-xs">
-					نتیجه‌ای یافت نشد
-				</div>
-			)}
-		</div>
-	) : null;
+					)}
 
-	return (
-		<div className="relative w-full">
-			<input
-				className="w-full cursor-pointer border-none bg-transparent px-2 py-1 font-medium text-secondary text-xs placeholder:font-medium placeholder:text-secondary focus:outline-none focus:ring-0"
-				onChange={handleInputChange}
-				onClick={() => setIsOpen(true)}
-				onFocus={() => setIsOpen(true)}
-				placeholder={placeholder}
-				ref={inputRef}
-				type="text"
-				value={isOpen ? searchTerm : displayText}
-			/>
-			{typeof document !== "undefined" && createPortal(dropdown, document.body)}
-		</div>
+					<div className="max-h-48 overflow-y-auto">
+						{filteredOptions.length > 0 ? (
+							filteredOptions.map((option) => {
+								const isSelected = multiSelect
+									? Array.isArray(value) && value.includes(option)
+									: value === option;
+								return (
+									<button
+										className={`w-full px-2 py-1.5 text-right text-xs transition-colors hover:bg-gray-100 ${
+											isSelected
+												? "bg-primary/10 font-medium text-primary"
+												: "text-gray-700"
+										}`}
+										key={option}
+										onClick={() => handleSelect(option)}
+										type="button"
+									>
+										{option}
+									</button>
+								);
+							})
+						) : (
+							<div className="px-2 py-1.5 text-center text-gray-400 text-xs">
+								نتیجه‌ای یافت نشد
+							</div>
+						)}
+					</div>
+				</div>
+			</PopoverContent>
+		</Popover>
 	);
 };
 
 SelectFilter.displayName = "SelectFilter";
 
-type DateRange = [DateObject | null, DateObject | null] | null;
-
-interface DateRangeFilterProps {
-	onChange: (value: DateRange) => void;
-	placeholder: string;
-	value: DateRange;
-}
-
 const DateRangeFilter = ({ onChange, placeholder, value }: DateRangeFilterProps) => {
-	const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-	const [calendarPosition, setCalendarPosition] = useState({ left: 0, top: 0 });
-	const containerRef = useRef<HTMLDivElement>(null);
-	const titleRef = useRef<HTMLDivElement>(null);
-	const datePickerRef = useRef<{
-		closeCalendar?: () => void;
-		openCalendar?: () => void;
-	}>(null);
+	const [localValue, setLocalValue] = useState<DateRange>(value);
+
+	useEffect(() => {
+		setLocalValue(value);
+	}, [value]);
 
 	const displayText = useMemo(() => {
-		if (value?.[0] && value?.[1]) {
-			return `${value[0].format("YYYY/MM/DD")} - ${value[1].format("YYYY/MM/DD")}`;
+		if (localValue?.[0] && localValue?.[1]) {
+			return `${localValue[0].format("YYYY/MM/DD")} - ${localValue[1].format("YYYY/MM/DD")}`;
 		}
-		if (value?.[0]) {
-			return value[0].format("YYYY/MM/DD");
+		if (localValue?.[0]) {
+			return localValue[0].format("YYYY/MM/DD");
 		}
 		return "";
-	}, [value]);
+	}, [localValue]);
 
 	const handleClear = useCallback(
 		(e: React.MouseEvent): void => {
 			e.stopPropagation();
+			setLocalValue(null);
 			onChange(null);
 		},
 		[onChange],
 	);
 
-	const handleTitleClick = useCallback((): void => {
-		setIsCalendarOpen(true);
-		if (titleRef.current) {
-			const rect = titleRef.current.getBoundingClientRect();
-			setCalendarPosition({
-				left: rect.left,
-				top: rect.bottom + 4,
-			});
-		}
-		setTimeout(() => {
-			datePickerRef.current?.openCalendar?.();
-		}, 50);
-	}, []);
-
 	const handleDateChange = useCallback(
 		(dates: DateObject[] | DateObject | null): void => {
 			if (Array.isArray(dates) && dates.length === 2) {
-				onChange([dates[0], dates[1]]);
-				setIsCalendarOpen(false);
+				const newRange: DateRange = [dates[0], dates[1]];
+				setLocalValue(newRange);
+				onChange(newRange);
 			} else if (Array.isArray(dates) && dates.length === 1) {
-				onChange([dates[0], null]);
+				const newRange: DateRange = [dates[0], null];
+				setLocalValue(newRange);
+				onChange(newRange);
+			} else if (dates === null) {
+				setLocalValue(null);
+				onChange(null);
 			}
 		},
 		[onChange],
 	);
 
-	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent): void => {
-			if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-				const calendarElement = document.querySelector(".rmdp-container");
-				if (calendarElement && !calendarElement.contains(event.target as Node)) {
-					setIsCalendarOpen(false);
-				}
-			}
-		};
-		if (isCalendarOpen) {
-			document.addEventListener("mousedown", handleClickOutside);
-		}
-		return () => document.removeEventListener("mousedown", handleClickOutside);
-	}, [isCalendarOpen]);
-
-	const datePickerValue = value || undefined;
-
-	const calendar = isCalendarOpen ? (
-		<div
-			className="fixed z-9999"
-			style={{
-				left: `${calendarPosition.left}px`,
-				top: `${calendarPosition.top}px`,
-			}}
-		>
-			<DatePicker
-				calendar={persian}
-				containerClassName="w-full"
-				locale={persian_fa}
-				onChange={handleDateChange}
-				onClose={() => setIsCalendarOpen(false)}
-				onOpen={() => setIsCalendarOpen(true)}
-				range={true}
-				ref={datePickerRef}
-				value={datePickerValue}
-			/>
-		</div>
-	) : null;
+	const datePickerValue = localValue
+		? localValue.filter((d): d is DateObject => d !== null)
+		: undefined;
 
 	return (
-		<div className="relative w-full" ref={containerRef}>
-			<div className="flex w-full items-center gap-1">
-				<div
-					className="min-w-0 flex-1 cursor-pointer px-2 py-1"
-					onClick={handleTitleClick}
-					ref={titleRef}
-				>
-					<span className="whitespace-nowrap font-medium text-secondary text-xs">
-						{displayText || placeholder}
-					</span>
+		<Popover offset={10} placement="bottom" showArrow={true}>
+			<PopoverTrigger>
+				<div className="flex w-full cursor-pointer items-center gap-1">
+					<div className="min-w-0 flex-1 px-2 py-1">
+						<span className="whitespace-nowrap font-medium text-secondary text-xs">
+							{displayText || placeholder}
+						</span>
+					</div>
+					{localValue?.[0] && (
+						<button
+							className="shrink-0 rounded p-0.5 transition-colors hover:bg-gray-100"
+							onClick={handleClear}
+							type="button"
+						>
+							<X className="h-3 w-3 text-gray-400" />
+						</button>
+					)}
 				</div>
-				{value?.[0] && (
-					<button
-						className="shrink-0 rounded p-0.5 transition-colors hover:bg-gray-100"
-						onClick={handleClear}
-						type="button"
-					>
-						<X className="h-3 w-3 text-gray-400" />
-					</button>
-				)}
-			</div>
-			{typeof document !== "undefined" && createPortal(calendar, document.body)}
-		</div>
+			</PopoverTrigger>
+			<PopoverContent className="p-0">
+				<DatePicker
+					calendar={persian}
+					locale={persian_fa}
+					onChange={handleDateChange}
+					range={true}
+					value={datePickerValue}
+				/>
+			</PopoverContent>
+		</Popover>
 	);
 };
 
 DateRangeFilter.displayName = "DateRangeFilter";
-
-interface TableHeaderCellProps {
-	config: ColumnConfig;
-	currentSort: "asc" | "desc" | false;
-	filterValue: DateRange | string[] | string;
-	onApplyFilters: () => void;
-	onFilterChange: (value: DateRange | string[] | string) => void;
-	onSort: () => void;
-}
 
 const TableHeaderCell = ({
 	config,
@@ -486,7 +481,6 @@ const TableHeaderCell = ({
 	return (
 		<div className="flex h-full w-full items-center gap-1.5 rounded-lg bg-white px-2 py-1.5 transition-colors hover:bg-gray-50">
 			<div className="min-w-0 flex-1">{renderFilter()}</div>
-
 			{config.enableSorting !== false && (
 				<SortIcon isSorted={currentSort} onClick={onSort} />
 			)}
@@ -496,77 +490,9 @@ const TableHeaderCell = ({
 
 TableHeaderCell.displayName = "TableHeaderCell";
 
-interface IndeterminateCheckboxProps {
-	checked: boolean;
-	className?: string;
-	indeterminate?: boolean;
-	onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
-
-const IndeterminateCheckbox = ({
-	checked,
-	className,
-	indeterminate = false,
-	onChange,
-	ref,
-}: IndeterminateCheckboxProps & {
-	ref?: React.RefObject<HTMLInputElement>;
-}) => {
-	const defaultRef = useRef<HTMLInputElement>(null);
-	const resolvedRef = (ref || defaultRef) as React.RefObject<HTMLInputElement>;
-
-	useEffect(() => {
-		if (resolvedRef.current) {
-			resolvedRef.current.indeterminate = indeterminate;
-		}
-	}, [indeterminate, resolvedRef]);
-
-	return (
-		<input
-			checked={checked}
-			className={className}
-			onChange={onChange}
-			ref={resolvedRef}
-			type="checkbox"
-		/>
-	);
-};
-
-IndeterminateCheckbox.displayName = "IndeterminateCheckbox";
-
-type FilterValue = DateRange | string[] | string;
-
-const customFilterFn = (
-	row: { getValue: (columnId: string) => string | undefined },
-	columnId: string,
-	filterValue: FilterValue,
-): boolean => {
-	const value = row.getValue(columnId);
-
-	if (!filterValue) {
-		return true;
-	}
-
-	if (Array.isArray(filterValue)) {
-		if (filterValue.length === 0) {
-			return true;
-		}
-		return filterValue.some((filter) =>
-			String(value).toLowerCase().includes(String(filter).toLowerCase()),
-		);
-	}
-
-	if (
-		filterValue &&
-		typeof filterValue === "object" &&
-		filterValue[0] !== null &&
-		filterValue[0] !== undefined
-	) {
-		return true;
-	}
-
-	return String(value).toLowerCase().includes(String(filterValue).toLowerCase());
-};
+// ============================================================================
+// Cell Renderers
+// ============================================================================
 
 const renderEmailCell = (value: string | undefined) => {
 	if (!value) {
@@ -651,87 +577,37 @@ const renderBadgeCell = (value: string | undefined, badgeConfig?: BadgeConfig) =
 	);
 };
 
-const applyRowFilters = (row: TableRow, columnFilters: ColumnFiltersState): boolean => {
-	for (const filter of columnFilters) {
-		const value = row[filter.id as keyof TableRow];
-
-		if (!filter.value) {
-			continue;
-		}
-
-		if (Array.isArray(filter.value)) {
-			if (filter.value.length === 0) {
-				continue;
-			}
-			const matchesFilter = filter.value.some((filterVal) =>
-				String(value).toLowerCase().includes(String(filterVal).toLowerCase()),
-			);
-			if (!matchesFilter) {
-				return false;
-			}
-		} else if (
-			filter.value &&
-			typeof filter.value === "object" &&
-			(filter.value as DateRange)?.[0]
-		) {
-			
-		} else {
-			const matchesFilter = String(value)
-				.toLowerCase()
-				.includes(String(filter.value).toLowerCase());
-			if (!matchesFilter) {
-				return false;
-			}
-		}
-	}
-	return true;
-};
-
-const sortRows = (rows: TableRow[], sorting: SortingState): TableRow[] => {
-	if (sorting.length === 0) {
-		return rows;
-	}
-
-	const sortConfig = sorting[0];
-	const sorted = [...rows].sort((a, b) => {
-		const aVal = a[sortConfig.id as keyof TableRow];
-		const bVal = b[sortConfig.id as keyof TableRow];
-
-		if (aVal === undefined || bVal === undefined) {
-			return 0;
-		}
-
-		if (aVal < bVal) {
-			return sortConfig.desc ? 1 : -1;
-		}
-		if (aVal > bVal) {
-			return sortConfig.desc ? -1 : 1;
-		}
-		return 0;
-	});
-
-	return sorted;
-};
+// ============================================================================
+// Main Table Component
+// ============================================================================
 
 const TableBuilder = ({
 	columns: columnConfigs,
 	data,
 	itemsPerPage = 8,
+	loading = false,
+	multiSelect = true,
 	onFilterChange,
+	onPageChange,
 	onRowEdit,
 	onRowView,
 	onSelectionChange,
 	onSortChange,
+	totalItems,
+	currentPage: externalCurrentPage,
 }: TableBuilderProps) => {
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 	const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
-	const [currentPage, setCurrentPage] = useState(1);
+	const [internalCurrentPage, setInternalCurrentPage] = useState(1);
 
-	const filterInputsRef = useRef<Record<string, FilterValue>>({});
-	const [, forceUpdate] = useState({});
+	const { setFilter, getFilter, filters } = useFilterState();
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const headerScrollRef = useRef<HTMLDivElement>(null);
+
+	useSyncScroll(headerScrollRef, scrollContainerRef);
+
+	const currentPage = externalCurrentPage ?? internalCurrentPage;
 
 	const handleSort = useCallback(
 		(columnId: string, currentSort: "asc" | "desc" | false): void => {
@@ -750,25 +626,16 @@ const TableBuilder = ({
 			if (onSortChange) {
 				const sortField = newSorting.length > 0 ? newSorting[0].id : null;
 				const sortOrderValue = newSorting.length > 0 ? newSorting[0].desc : null;
-
-				let sortOrder: "asc" | "desc" | null = null;
-				if (sortOrderValue !== null) {
-					sortOrder = sortOrderValue ? "desc" : "asc";
-				}
-
+				const sortOrder: "asc" | "desc" | null =
+					sortOrderValue !== null ? (sortOrderValue ? "desc" : "asc") : null;
 				onSortChange(sortField, sortOrder);
 			}
 		},
 		[onSortChange],
 	);
 
-	const handleFilterChange = useCallback((columnId: string, value: FilterValue): void => {
-		filterInputsRef.current[columnId] = value;
-		forceUpdate({});
-	}, []);
-
 	const applyFilters = useCallback((): void => {
-		const newFilters: ColumnFiltersState = Object.entries(filterInputsRef.current)
+		const newFilters: ColumnFiltersState = Object.entries(filters)
 			.filter(([, value]) => {
 				if (Array.isArray(value)) {
 					return value.length > 0;
@@ -781,16 +648,21 @@ const TableBuilder = ({
 			.map(([id, value]) => ({ id, value }));
 
 		setColumnFilters(newFilters);
-		setCurrentPage(1);
+
+		if (onPageChange) {
+			onPageChange(1);
+		} else {
+			setInternalCurrentPage(1);
+		}
 
 		if (onFilterChange) {
-			const filterObj: Record<string, DateRange | string[] | string> = {};
+			const filterObj: Record<string, FilterValue> = {};
 			for (const f of newFilters) {
-				filterObj[f.id] = f.value as DateRange | string[] | string;
+				filterObj[f.id] = f.value as FilterValue;
 			}
 			onFilterChange(filterObj);
 		}
-	}, [onFilterChange]);
+	}, [filters, onFilterChange, onPageChange]);
 
 	const renderCellContent = useCallback(
 		(config: ColumnConfig, value: string | undefined) => {
@@ -815,51 +687,93 @@ const TableBuilder = ({
 		[],
 	);
 
+	const handleRowSelection = useCallback(
+		(index: number, checked: boolean) => {
+			if (multiSelect) {
+				setRowSelection((prev) => ({
+					...prev,
+					[index]: checked,
+				}));
+			} else {
+				setRowSelection({ [index]: checked });
+			}
+		},
+		[multiSelect],
+	);
+
+	const handleSelectAll = useCallback(
+		(checked: boolean) => {
+			if (multiSelect) {
+				const newSelection: Record<string, boolean> = {};
+				if (checked) {
+					data.forEach((_, index) => {
+						newSelection[index] = true;
+					});
+				}
+				setRowSelection(newSelection);
+			}
+		},
+		[data, multiSelect],
+	);
+
 	const columns: ColumnDef<TableRow>[] = useMemo(
 		() => [
 			{
-				cell: ({ row }) => (
-					<div className="flex items-center justify-start gap-2 pr-1.5">
-						<input
-							checked={row.getIsSelected()}
-							className="h-4 w-4 shrink-0 cursor-pointer rounded border-2 border-gray-300 accent-primary"
-							disabled={!row.getCanSelect()}
-							onChange={row.getToggleSelectedHandler()}
-							type="checkbox"
-						/>
-						<div className="flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
-							<button
-								className="flex items-center justify-center p-0.5 text-gray-600 transition-colors hover:text-gray-800"
-								onClick={() => onRowView?.(row.original)}
-								title="نمایش"
-								type="button"
-							>
-								<Eye className="h-5 w-5" />
-							</button>
-							<button
-								className="flex items-center justify-center p-0.5 text-primary transition-colors hover:text-primary/80"
-								onClick={() => onRowEdit?.(row.original)}
-								title="ویرایش"
-								type="button"
-							>
-								<Edit className="h-5 w-5" />
-							</button>
+				cell: ({ row }) => {
+					const globalIndex = (currentPage - 1) * itemsPerPage + row.index;
+					const isSelected = rowSelection[globalIndex] || false;
+
+					return (
+						<div className="flex items-center justify-start gap-2 pr-1.5">
+							<Checkbox
+								classNames={{
+									wrapper: "after:bg-primary after:rounded",
+								}}
+								isSelected={isSelected}
+								onValueChange={(checked) => handleRowSelection(globalIndex, checked)}
+								size="sm"
+							/>
+							<div className="flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+								<button
+									className="flex items-center justify-center p-0.5 text-gray-600 transition-colors hover:text-gray-800"
+									onClick={() => onRowView?.(row.original)}
+									title="نمایش"
+									type="button"
+								>
+									<Eye className="h-5 w-5 fill-secondary text-transparent" />
+								</button>
+								<button
+									className="flex items-center justify-center p-0.5 text-primary transition-colors hover:text-primary/80"
+									onClick={() => onRowEdit?.(row.original)}
+									title="ویرایش"
+									type="button"
+								>
+									<Edit className="h-5 w-5 fill-primary text-transparent" />
+								</button>
+							</div>
 						</div>
-					</div>
-				),
+					);
+				},
 				enableSorting: false,
 				header: ({ table: headerTable }) => {
-					const allRowsSelected = headerTable.getIsAllPageRowsSelected();
-					const someRowsSelected = headerTable.getIsSomePageRowsSelected();
+					const allRowsSelected =
+						Object.keys(rowSelection).length === data.length && data.length > 0;
+					const someRowsSelected =
+						Object.keys(rowSelection).length > 0 && !allRowsSelected;
 
 					return (
 						<div className="flex h-full items-center justify-start gap-5">
-							<IndeterminateCheckbox
-								checked={allRowsSelected}
-								className="h-4 w-4 shrink-0 cursor-pointer rounded border-2 border-gray-300 accent-primary"
-								indeterminate={someRowsSelected && !allRowsSelected}
-								onChange={headerTable.getToggleAllPageRowsSelectedHandler()}
-							/>
+							{multiSelect && (
+								<Checkbox
+									classNames={{
+										wrapper: "after:bg-primary after:rounded",
+									}}
+									isIndeterminate={someRowsSelected}
+									isSelected={allRowsSelected}
+									onValueChange={handleSelectAll}
+									size="sm"
+								/>
+							)}
 							<button
 								className="flex items-center justify-center rounded-lg bg-secondary p-1.5 transition-colors hover:bg-secondary/90"
 								onClick={applyFilters}
@@ -881,20 +795,17 @@ const TableBuilder = ({
 					return renderCellContent(config, value as string | undefined);
 				},
 				enableSorting: config.enableSorting !== false,
-				filterFn: customFilterFn,
 				header: ({
 					column,
 				}: {
-					column: {
-						getIsSorted: () => "asc" | "desc" | false;
-					};
+					column: { getIsSorted: () => "asc" | "desc" | false };
 				}) => (
 					<TableHeaderCell
 						config={config}
 						currentSort={column.getIsSorted()}
-						filterValue={filterInputsRef.current[config.accessorKey]}
+						filterValue={getFilter(config.accessorKey)}
 						onApplyFilters={applyFilters}
-						onFilterChange={(value) => handleFilterChange(config.accessorKey, value)}
+						onFilterChange={(value) => setFilter(config.accessorKey, value)}
 						onSort={() => handleSort(config.accessorKey, column.getIsSorted())}
 					/>
 				),
@@ -904,11 +815,19 @@ const TableBuilder = ({
 		[
 			applyFilters,
 			columnConfigs,
-			handleFilterChange,
+			currentPage,
+			data.length,
+			getFilter,
+			handleRowSelection,
+			handleSelectAll,
 			handleSort,
+			itemsPerPage,
+			multiSelect,
 			onRowEdit,
 			onRowView,
 			renderCellContent,
+			rowSelection,
+			setFilter,
 		],
 	);
 
@@ -917,9 +836,9 @@ const TableBuilder = ({
 		data,
 		enableRowSelection: true,
 		getCoreRowModel: getCoreRowModel(),
-		getFilteredRowModel: getCoreRowModel(),
-		getSortedRowModel: getSortedRowModel(),
-		manualFiltering: false,
+		manualFiltering: true,
+		manualPagination: true,
+		manualSorting: true,
 		onColumnFiltersChange: setColumnFilters,
 		onRowSelectionChange: setRowSelection,
 		onSortingChange: setSorting,
@@ -930,59 +849,46 @@ const TableBuilder = ({
 		},
 	});
 
-	const filteredData = useMemo(() => {
-		let filtered = data.filter((row) => applyRowFilters(row, columnFilters));
-		filtered = sortRows(filtered, sorting);
-		return filtered;
-	}, [columnFilters, data, sorting]);
-
-	const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-	const startIndex = (currentPage - 1) * itemsPerPage;
-	const endIndex = startIndex + itemsPerPage;
-	const paginatedData = filteredData.slice(startIndex, endIndex);
-
 	const columnWidths = useMemo(() => {
 		return columns.map((col) => col.size || 150);
 	}, [columns]);
 
-	useEffect(() => {
-		const bodyScroll = scrollContainerRef.current;
-		const headerScroll = headerScrollRef.current;
+	const totalPages = totalItems
+		? Math.ceil(totalItems / itemsPerPage)
+		: Math.ceil(data.length / itemsPerPage);
 
-		if (!bodyScroll || !headerScroll) {
-			return;
-		}
-
-		const handleBodyScroll = (): void => {
-			headerScroll.scrollLeft = bodyScroll.scrollLeft;
-		};
-
-		bodyScroll.addEventListener("scroll", handleBodyScroll, { passive: true });
-
-		return () => {
-			bodyScroll.removeEventListener("scroll", handleBodyScroll);
-		};
-	}, []);
-
-	useEffect(() => {
-		setCurrentPage(1);
-	}, []);
+	const handlePageChange = useCallback(
+		(page: number) => {
+			if (onPageChange) {
+				onPageChange(page);
+			} else {
+				setInternalCurrentPage(page);
+			}
+		},
+		[onPageChange],
+	);
 
 	useEffect(() => {
 		if (onSelectionChange) {
-			const selectedIndices = Object.keys(rowSelection).filter(
-				(key) => rowSelection[key],
-			);
-			const selectedIds = selectedIndices
+			const selectedIds = Object.keys(rowSelection)
+				.filter((key) => rowSelection[key])
 				.map((index) => {
 					const dataIndex = Number.parseInt(index, 10);
-					return filteredData[dataIndex]?.id;
+					return data[dataIndex]?.id;
 				})
 				.filter((id): id is number => id !== undefined);
 
 			onSelectionChange(selectedIds);
 		}
-	}, [filteredData, onSelectionChange, rowSelection]);
+	}, [data, onSelectionChange, rowSelection]);
+
+	if (loading) {
+		return (
+			<div className="flex h-full flex-col items-center justify-center rounded-2xl bg-primary p-3">
+				<Spinner color="warning" size="lg" />
+			</div>
+		);
+	}
 
 	return (
 		<div className="flex h-full flex-col rounded-2xl bg-primary p-3" dir="rtl">
@@ -1028,9 +934,9 @@ const TableBuilder = ({
 				>
 					<div className="pr-3">
 						<div className="flex flex-col gap-1" style={{ minWidth: "max-content" }}>
-							{paginatedData.length > 0 ? (
-								paginatedData.map((rowData, rowIndex) => {
-									const globalIndex = startIndex + rowIndex;
+							{data.length > 0 ? (
+								data.map((rowData, rowIndex) => {
+									const globalIndex = (currentPage - 1) * itemsPerPage + rowIndex;
 									const isSelected = rowSelection[globalIndex] || false;
 
 									return (
@@ -1043,16 +949,15 @@ const TableBuilder = ({
 													const cellContent =
 														colIndex === 0 ? (
 															<div className="flex justify-start gap-2 pr-1.5">
-																<input
-																	checked={isSelected}
-																	className="h-4 w-4 shrink-0 cursor-pointer rounded border-2 border-gray-300 accent-primary"
-																	onChange={(e) => {
-																		setRowSelection((prev) => ({
-																			...prev,
-																			[globalIndex]: e.target.checked,
-																		}));
+																<Checkbox
+																	classNames={{
+																		wrapper: "after:bg-primary after:rounded",
 																	}}
-																	type="checkbox"
+																	isSelected={isSelected}
+																	onValueChange={(checked) =>
+																		handleRowSelection(globalIndex, checked)
+																	}
+																	size="sm"
 																/>
 																<div className="flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
 																	<button
@@ -1061,7 +966,7 @@ const TableBuilder = ({
 																		title="نمایش"
 																		type="button"
 																	>
-																		<Eye className="h-5 w-5 transition-transform duration-200 group-hover/icon:scale-110" />
+																		<Eye className="h-5 w-5 fill-secondary text-transparent transition-transform duration-200 group-hover/icon:scale-110" />
 																	</button>
 																	<button
 																		className="group/icon flex items-center justify-center p-0.5 text-primary transition-all duration-200 hover:scale-125 hover:text-primary/80"
@@ -1069,7 +974,7 @@ const TableBuilder = ({
 																		title="ویرایش"
 																		type="button"
 																	>
-																		<Edit className="h-5 w-5 transition-transform duration-200 group-hover/icon:scale-110" />
+																		<Edit className="h-5 w-5 fill-primary text-transparent transition-transform duration-200 group-hover/icon:scale-110" />
 																	</button>
 																</div>
 															</div>
@@ -1124,7 +1029,7 @@ const TableBuilder = ({
 								wrapper: "gap-1",
 							}}
 							dir="ltr"
-							onChange={setCurrentPage}
+							onChange={handlePageChange}
 							page={currentPage}
 							showControls={true}
 							total={totalPages}
@@ -1178,6 +1083,10 @@ const TableBuilder = ({
 		</div>
 	);
 };
+
+// ============================================================================
+// Example Usage
+// ============================================================================
 
 export default function TableBuilderExample() {
 	const [mockData] = useState<TableRow[]>([
@@ -1375,12 +1284,9 @@ export default function TableBuilderExample() {
 		},
 	];
 
-	const handleFilterChange = useCallback(
-		(filters: Record<string, DateRange | string[] | string>): void => {
-			console.log("🎯 Filter Change:", filters);
-		},
-		[],
-	);
+	const handleFilterChange = useCallback((filters: Record<string, FilterValue>): void => {
+		console.log("🎯 Filter Change:", filters);
+	}, []);
 
 	const handleSortChange = useCallback(
 		(sortField: string | null, sortOrder: "asc" | "desc" | null): void => {
@@ -1405,7 +1311,8 @@ export default function TableBuilderExample() {
 		<TableBuilder
 			columns={columnConfig}
 			data={mockData}
-			itemsPerPage={8}
+			itemsPerPage={1}
+			multiSelect={false}
 			onFilterChange={handleFilterChange}
 			onRowEdit={handleEdit}
 			onRowView={handleView}
