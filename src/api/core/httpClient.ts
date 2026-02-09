@@ -1,7 +1,3 @@
-/** biome-ignore-all assist/source/organizeImports: <> */
-/** biome-ignore-all lint/complexity/noExcessiveCognitiveComplexity: <> */
-/** biome-ignore-all lint/nursery/noUnnecessaryConditions: <> */
-/** biome-ignore-all assist/source/useSortedKeys: <> */
 import axios, {
 	type AxiosError,
 	type AxiosInstance,
