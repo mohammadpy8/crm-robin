@@ -46,8 +46,11 @@ export const useAuth = (options?: UseAuthOptions): UseAuthReturn => {
 
 			options?.onLoginSuccess?.(response);
 
+			await new Promise(resolve => setTimeout(resolve, 150));
+
 			const redirectUrl = options?.callbackUrl || "/users/list";
 			window.location.href = redirectUrl;
+
 		} catch (err) {
 			const axiosError = err as AxiosError<{
 				message?: string;
@@ -81,7 +84,9 @@ export const useAuth = (options?: UseAuthOptions): UseAuthReturn => {
 		setError(null);
 		setIsSuccess(false);
 
-		window.location.href = "/login";
+		setTimeout(() => {
+			window.location.href = "/login";
+		}, 150);
 
 		options?.onLogoutSuccess?.();
 	};

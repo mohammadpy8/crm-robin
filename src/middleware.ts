@@ -1,36 +1,39 @@
-import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-const PUBLIC_ROUTES = ["/login"];
-const AUTH_ROUTES = ["/login"];
-const DEFAULT_REDIRECT = "/users/list";
-const LOGIN_PATH = "/login";
+const PROTECTED_ROUTES = [
+	"/users", 
+	"/contacts", 
+	"/accounts", 
+	"/leads"
+];
 
 export function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
-
-	const accessToken = request.cookies.get("accessToken")?.value;
+	
+	const accessToken = request.cookies.get("access_token")?.value;
 	const isAuthenticated = !!accessToken;
 
-	if (isAuthenticated && AUTH_ROUTES.includes(pathname)) {
-		return NextResponse.redirect(new URL(DEFAULT_REDIRECT, request.url));
-	}
+	const isPublicRoute = pathname === "/login";
+	const isProtectedRoute = PROTECTED_ROUTES.some(route => 
+		pathname.startsWith(route)
+	);
 
-	if (!isAuthenticated && !PUBLIC_ROUTES.includes(pathname)) {
-		const url = new URL(LOGIN_PATH, request.url);
+	if (!isAuthenticated && isProtectedRoute) {
+		const url = new URL("/login", request.url);
 		url.searchParams.set("callbackUrl", pathname);
 		return NextResponse.redirect(url);
 	}
 
+	if (isAuthenticated && isPublicRoute) {
+		return NextResponse.redirect(new URL("/users/list", request.url));
+	}
 	return NextResponse.next();
 }
 
 export const config = {
 	matcher: [
 		"/login",
-		"/users/:path*",
-		"/contacts/:path*",
-		"/leads/:path*",
-		"/accounts/:path*",
+		"/(users|contacts|accounts|leads)/:path*",
 	],
 };

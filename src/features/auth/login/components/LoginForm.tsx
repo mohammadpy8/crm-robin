@@ -25,9 +25,7 @@ export function LoginForm() {
 	}, [router, callbackUrl]);
 
 	const { login, isLoading } = useAuth({
-		onLoginSuccess: () => {
-			router.push(callbackUrl);
-		},
+		callbackUrl, 
 	});
 
 	const {
