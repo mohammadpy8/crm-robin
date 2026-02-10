@@ -1,3 +1,7 @@
+/** biome-ignore-all assist/source/organizeImports: <> */
+/** biome-ignore-all assist/source/useSortedKeys: <> */
+/** biome-ignore-all lint/suspicious/noExplicitAny: <> */
+/** biome-ignore-all lint/suspicious/useAwait: <> */
 import { API_CONFIG } from "@/api/core/config";
 import { http } from "@/api/core/httpClient";
 import type {
@@ -21,7 +25,9 @@ export const leadService = {
 
 	getAll: async (params?: LeadQueryParams): Promise<PaginatedLeadsResponse> => {
 		const queryString = params ? `?${new URLSearchParams(params as any).toString()}` : "";
-		return http.get<PaginatedLeadsResponse>(`${API_CONFIG.ENDPOINTS.LEAD.BASE}${queryString}`);
+		return http.get<PaginatedLeadsResponse>(
+			`${API_CONFIG.ENDPOINTS.LEAD.BASE}${queryString}`,
+		);
 	},
 
 	getById: async (id: number): Promise<LeadEntity> => {
@@ -52,7 +58,6 @@ export const leadService = {
 		return http.post<void>(API_CONFIG.ENDPOINTS.LEAD.BULK_ASSIGN, data);
 	},
 
-
 	bulkDelete: async (data: BulkDeleteLeadsDto): Promise<void> => {
 		return http.post<void>(API_CONFIG.ENDPOINTS.LEAD.BULK_DELETE, data);
 	},
@@ -61,7 +66,10 @@ export const leadService = {
 		return http.post<void>(API_CONFIG.ENDPOINTS.LEAD.BULK_STATUS, data);
 	},
 
-	importExcel: async (file: File, assignedToUserId?: number): Promise<ImportLeadsResponse> => {
+	importExcel: async (
+		file: File,
+		assignedToUserId?: number,
+	): Promise<ImportLeadsResponse> => {
 		const formData = new FormData();
 		formData.append("file", file);
 		if (assignedToUserId) {

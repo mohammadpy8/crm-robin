@@ -1,3 +1,6 @@
+/** biome-ignore-all lint/style/useNumericSeparators: <> */
+/** biome-ignore-all assist/source/useSortedKeys: <> */
+
 import { ENDPOINTS } from "@/api/endpoints";
 
 export const API_CONFIG = {
@@ -12,7 +15,7 @@ export const API_CONFIG = {
 	},
 
 	COOKIE_OPTIONS: {
-		ACCESS_TOKEN_MAX_AGE: 3 * 60 * 60, 
-		REFRESH_TOKEN_MAX_AGE: 7 * 24 * 60 * 60, 
+		ACCESS_TOKEN_MAX_AGE: 3 * 60 * 60,
+		REFRESH_TOKEN_MAX_AGE: 7 * 24 * 60 * 60,
 	},
 } as const;

@@ -60,7 +60,7 @@ export interface ToolbarConfig {
 	};
 	moreButton?: {
 		label?: string;
-		icon: ReactNode;
+		icon?: ReactNode;
 		options?: MoreOption[];
 		onClick?: () => void;
 		disabled?: boolean;
@@ -78,6 +78,6 @@ export interface ToolbarConfig {
 export interface ToolbarContextValue {
 	selectedCount: number;
 	setSelectedCount: (count: number) => void;
-	selectedFilter: string;
-	setSelectedFilter: (filter: string) => void;
+	selectedFilter: FilterOption;
+	setSelectedFilter: (filter: FilterOption) => void;
 }

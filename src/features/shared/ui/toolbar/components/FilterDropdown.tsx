@@ -6,7 +6,7 @@ import type { FilterOption } from "@/features/shared/ui/toolbar/types/toolbar.ty
 import { cn } from "@/lib/utils";
 
 interface FilterDropdownProps {
-	selectedFilter: string;
+	selectedFilter: FilterOption;
 	onFilterChange: (option: FilterOption) => void;
 	options: FilterOption[];
 	icon: React.ReactNode;
@@ -33,7 +33,7 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
 					type="button"
 				>
 					{icon && <span className="flex items-center justify-center">{icon}</span>}
-					<span>{selectedFilter}</span>
+					<span>{selectedFilter.label}</span>
 					<span className="flex items-center justify-center">
 						<ChevronDown className="h-4 w-4" />
 					</span>
@@ -45,7 +45,7 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
 						<button
 							className={cn(
 								"w-full px-4 py-2 text-right text-sm transition-colors hover:bg-gray-100",
-								selectedFilter === option.label
+								selectedFilter.label === option.label
 									? "bg-gray-50 font-medium text-gray-900"
 									: "text-gray-700",
 							)}

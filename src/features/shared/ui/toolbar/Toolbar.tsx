@@ -18,7 +18,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({ config }) => {
 	const { selectedCount, selectedFilter, setSelectedFilter } = useToolbarContext();
 
 	const handleFilterChange = (option: FilterOption) => {
-		setSelectedFilter(option.label);
+		setSelectedFilter(option);
 		config.filterButton.onFilterChange?.(option.value, option.label);
 	};
 

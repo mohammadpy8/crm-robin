@@ -12,7 +12,7 @@ import type {
 
 interface TopToolbarProps {
 	config: ToolbarConfig;
-	selectedFilter: string;
+	selectedFilter: FilterOption;
 	onFilterChange: (option: FilterOption) => void;
 	onMoreOptionClick: (option: MoreOption) => void;
 	onCreateDropdownClick: (option: CreateButtonOption) => void;

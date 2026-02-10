@@ -1,3 +1,7 @@
+/** biome-ignore-all assist/source/organizeImports: <> */
+/** biome-ignore-all assist/source/useSortedKeys: <> */
+/** biome-ignore-all lint/suspicious/noExplicitAny: <> */
+/** biome-ignore-all lint/suspicious/useAwait: <> */
 import { API_CONFIG } from "@/api/core/config";
 import { http } from "@/api/core/httpClient";
 import type {

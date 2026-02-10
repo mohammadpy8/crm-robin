@@ -1,3 +1,4 @@
+/** biome-ignore-all assist/source/useSortedKeys: <> */
 export const ENDPOINTS = {
 	AUTH: {
 		SIGNIN: "/auth/signin",
