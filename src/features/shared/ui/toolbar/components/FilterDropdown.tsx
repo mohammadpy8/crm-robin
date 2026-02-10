@@ -45,7 +45,7 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
 						<button
 							className={cn(
 								"w-full px-4 py-2 text-right text-sm transition-colors hover:bg-gray-100",
-								selectedFilter.label === option.label
+								selectedFilter.value === option.value
 									? "bg-gray-50 font-medium text-gray-900"
 									: "text-gray-700",
 							)}

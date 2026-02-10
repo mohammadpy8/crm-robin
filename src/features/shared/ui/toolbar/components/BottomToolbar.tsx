@@ -6,6 +6,7 @@ import { ViewButtonGroup } from "@/features/shared/ui/toolbar/components/ViewBut
 import type {
 	ActionButton,
 	ViewButton,
+	ToolbarHandlers,
 } from "@/features/shared/ui/toolbar/types/toolbar.types";
 
 interface BottomToolbarProps {
@@ -18,6 +19,7 @@ interface BottomToolbarProps {
 	hasSelection: boolean;
 	selectedCount: number;
 	showSelectionCount?: boolean;
+	handlers?: ToolbarHandlers;
 }
 
 export const BottomToolbar: React.FC<BottomToolbarProps> = ({
@@ -27,17 +29,19 @@ export const BottomToolbar: React.FC<BottomToolbarProps> = ({
 	hasSelection,
 	selectedCount,
 	showSelectionCount = true,
+	handlers = {},
 }) => {
 	return (
 		<div className="w-full">
-			<div className="mx-auto max-w-360 px-10">
-				<div className="flex h-16 items-center justify-between">
+			<div className="mx-auto max-w-360 overflow-x-auto px-4 sm:px-6 md:px-10">
+				<div className="flex h-16 min-w-max items-center justify-between">
 					<div className="flex items-center gap-6">
 						{pageTitle && <PageTitle icon={pageTitle.icon} title={pageTitle.title} />}
 
 						{hasSelection && actionButtons && actionButtons.length > 0 && (
 							<ActionButtonGroup
 								actionButtons={actionButtons}
+								handlers={handlers}
 								selectedCount={selectedCount}
 								showSelectionCount={showSelectionCount}
 							/>

@@ -9,5 +9,6 @@ export type {
 	MoreOption,
 	ToolbarConfig,
 	ToolbarContextValue,
+	ToolbarHandlers,
 	ViewButton,
 } from "./types/toolbar.types";

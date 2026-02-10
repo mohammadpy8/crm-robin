@@ -7,10 +7,10 @@ import { cn } from "@/lib/utils";
 
 interface MoreButtonProps {
 	label: string;
-	icon: React.ReactNode;
+	icon?: React.ReactNode;
 	options?: MoreOption[];
 	onClick?: () => void;
-	onOptionClick: (option: MoreOption) => void;
+	onOptionClick?: (option: MoreOption) => void;
 	disabled?: boolean;
 }
 
@@ -71,7 +71,7 @@ export const MoreButton: React.FC<MoreButtonProps> = ({
 						<button
 							className="w-full px-4 py-2 text-right text-gray-700 text-sm transition-colors hover:bg-gray-100"
 							key={`${option.value}-${index}`}
-							onClick={() => onOptionClick(option)}
+							onClick={() => onOptionClick?.(option)}
 							type="button"
 						>
 							{option.label}

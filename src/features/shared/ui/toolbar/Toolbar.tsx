@@ -4,30 +4,22 @@ import { BottomToolbar } from "./components/BottomToolbar";
 import { TopToolbar } from "./components/TopToolbar";
 import { useToolbarContext } from "./hooks/useToolbarContext";
 import type {
-	CreateButtonOption,
 	FilterOption,
-	MoreOption,
 	ToolbarConfig,
+	ToolbarHandlers,
 } from "./types/toolbar.types";
 
 interface ToolbarProps {
 	config: ToolbarConfig;
+	handlers?: ToolbarHandlers; 
 }
 
-export const Toolbar: React.FC<ToolbarProps> = ({ config }) => {
+export const Toolbar: React.FC<ToolbarProps> = ({ config, handlers = {} }) => {
 	const { selectedCount, selectedFilter, setSelectedFilter } = useToolbarContext();
 
 	const handleFilterChange = (option: FilterOption) => {
 		setSelectedFilter(option);
-		config.filterButton.onFilterChange?.(option.value, option.label);
-	};
-
-	const handleMoreOptionClick = (option: MoreOption) => {
-		option.onClick?.();
-	};
-
-	const handleCreateDropdownClick = (option: CreateButtonOption) => {
-		option.onClick?.();
+		handlers.onFilterChange?.(option.value, option.label);
 	};
 
 	const hasSelection = selectedCount > 0;
@@ -36,14 +28,14 @@ export const Toolbar: React.FC<ToolbarProps> = ({ config }) => {
 		<div className="w-full">
 			<TopToolbar
 				config={config}
-				onCreateDropdownClick={handleCreateDropdownClick}
+				handlers={handlers}
 				onFilterChange={handleFilterChange}
-				onMoreOptionClick={handleMoreOptionClick}
 				selectedFilter={selectedFilter}
 			/>
 
 			<BottomToolbar
 				actionButtons={config.actionButtons}
+				handlers={handlers}
 				hasSelection={hasSelection}
 				pageTitle={config.pageTitle}
 				selectedCount={selectedCount}

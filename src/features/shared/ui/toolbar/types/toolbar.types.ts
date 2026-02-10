@@ -16,17 +16,24 @@ export interface ActionButtonOption {
 	value: string;
 }
 
+
+export type ActionButtonVisibility = 
+	| "always"    
+	| "single"  
+	| "multiple"
+	| "any";
+
 export interface ActionButton {
 	id: string;
 	label: string;
 	icon: ReactNode;
 	variant: "ghost" | "danger";
-	onClick?: () => void;
 	disabled?: boolean;
 	className?: string;
 	hasPopover?: boolean;
 	popoverOptions?: ActionButtonOption[];
-	onPopoverConfirm?: (selectedValues: string[]) => void;
+	visibility?: ActionButtonVisibility;
+	disableOnMultiple?: boolean; // غیرفعال شدن در حالت انتخاب جمعی
 }
 
 export interface ViewButton {
@@ -41,14 +48,12 @@ export interface ViewButton {
 export interface CreateButtonOption {
 	label: string;
 	value: string;
-	onClick?: () => void;
 }
 
 export interface ToolbarConfig {
 	createButton: {
 		label: string;
 		icon: ReactNode;
-		onClick: () => void;
 		disabled?: boolean;
 		dropdownOptions?: CreateButtonOption[];
 	};
@@ -56,13 +61,11 @@ export interface ToolbarConfig {
 		defaultLabel: string;
 		icon: ReactNode;
 		options: FilterOption[];
-		onFilterChange?: (value: string, label: string) => void;
 	};
 	moreButton?: {
 		label?: string;
 		icon?: ReactNode;
 		options?: MoreOption[];
-		onClick?: () => void;
 		disabled?: boolean;
 	};
 
@@ -73,6 +76,16 @@ export interface ToolbarConfig {
 	actionButtons?: ActionButton[];
 	viewButtons?: ViewButton[];
 	showSelectionCount?: boolean;
+}
+
+export interface ToolbarHandlers {
+	onCreateClick?: () => void;
+	onCreateDropdownClick?: (option: CreateButtonOption) => void;
+	onFilterChange?: (value: string, label: string) => void;
+	onMoreClick?: () => void;
+	onMoreOptionClick?: (option: MoreOption) => void;
+	onActionButtonClick?: (buttonId: string) => void;
+	onActionButtonPopoverConfirm?: (buttonId: string, selectedValues: string[]) => void;
 }
 
 export interface ToolbarContextValue {

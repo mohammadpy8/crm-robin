@@ -12,7 +12,12 @@ import { useState } from "react";
 import type { ActionButton as ActionButtonType } from "@/features/shared/ui/toolbar/types/toolbar.types";
 import { cn } from "@/lib/utils";
 
-export const ActionButton: React.FC<ActionButtonType> = ({
+export const ActionButton: React.FC<
+	ActionButtonType & {
+		onClick?: () => void;
+		onPopoverConfirm?: (selectedValues: string[]) => void;
+	}
+> = ({
 	label,
 	icon,
 	onClick,

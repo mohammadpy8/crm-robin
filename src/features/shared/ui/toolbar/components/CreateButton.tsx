@@ -9,16 +9,17 @@ interface CreateButtonProps {
 	config: {
 		label: string;
 		icon: React.ReactNode;
-		onClick: () => void;
 		disabled?: boolean;
 		dropdownOptions?: CreateButtonOption[];
 	};
-	onDropdownClick: (option: CreateButtonOption) => void;
+	onCreateClick?: () => void;
+	onCreateDropdownClick?: (option: CreateButtonOption) => void;
 }
 
 export const CreateButton: React.FC<CreateButtonProps> = ({
 	config,
-	onDropdownClick,
+	onCreateClick,
+	onCreateDropdownClick,
 }) => {
 	const hasDropdown = config.dropdownOptions && config.dropdownOptions.length > 0;
 
@@ -35,7 +36,7 @@ export const CreateButton: React.FC<CreateButtonProps> = ({
 					"whitespace-nowrap hover:bg-secondary hover:text-white",
 				)}
 				disabled={config.disabled}
-				onClick={config.onClick}
+				onClick={onCreateClick}
 				type="button"
 			>
 				{config.icon && (
@@ -60,7 +61,7 @@ export const CreateButton: React.FC<CreateButtonProps> = ({
 					"border-gray-200 border-l hover:bg-secondary hover:text-white",
 				)}
 				disabled={config.disabled}
-				onClick={config.onClick}
+				onClick={onCreateClick}
 				type="button"
 			>
 				{config.icon && (
@@ -92,7 +93,7 @@ export const CreateButton: React.FC<CreateButtonProps> = ({
 							<button
 								className="w-full px-4 py-2 text-right text-gray-700 text-sm transition-colors hover:bg-gray-100"
 								key={`${option.value}-${index}`}
-								onClick={() => onDropdownClick(option)}
+								onClick={() => onCreateDropdownClick?.(option)}
 								type="button"
 							>
 								{option.label}
