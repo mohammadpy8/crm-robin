@@ -1,13 +1,11 @@
-/** biome-ignore-all assist/source/useSortedKeys: <> */
-/** biome-ignore-all assist/source/organizeImports: <> */
 import axios, {
 	type AxiosError,
 	type AxiosInstance,
 	type AxiosRequestConfig,
 	type AxiosResponse,
 } from "axios";
-import { API_CONFIG } from "./config";
 import { cookieManager } from "../../lib/utils/cookie";
+import { API_CONFIG } from "./config";
 
 interface ApiErrorResponse {
 	message: string | string[];
@@ -28,20 +26,18 @@ export const getErrorMessage = (error: unknown): string => {
 	if (axios.isAxiosError(error)) {
 		const axiosError = error as AxiosError<ApiErrorResponse>;
 		const serverMessage = axiosError.response?.data?.message;
-		
+
 		if (serverMessage) {
-			return Array.isArray(serverMessage) 
-				? serverMessage.join(", ") 
-				: serverMessage;
+			return Array.isArray(serverMessage) ? serverMessage.join(", ") : serverMessage;
 		}
-		
+
 		return axiosError.message || "خطای ناشناخته";
 	}
-	
+
 	if (error instanceof Error) {
 		return error.message;
 	}
-	
+
 	return "خطای ناشناخته";
 };
 
@@ -61,10 +57,10 @@ const processQueue = (error: Error | null, token: string | null = null): void =>
 
 const axiosInstance: AxiosInstance = axios.create({
 	baseURL: API_CONFIG.BASE_URL,
-	timeout: API_CONFIG.TIMEOUT,
 	headers: {
 		"Content-Type": "application/json",
 	},
+	timeout: API_CONFIG.TIMEOUT,
 	withCredentials: true,
 });
 
@@ -95,7 +91,7 @@ axiosInstance.interceptors.response.use(
 		if (error.response?.status === 401 && !originalRequest._retry && !isLoginEndpoint) {
 			if (isRefreshing) {
 				return new Promise((resolve, reject) => {
-					failedQueue.push({ resolve, reject });
+					failedQueue.push({ reject, resolve });
 				})
 					.then(() => axiosInstance(originalRequest))
 					.catch((err: unknown) => Promise.reject(err));
@@ -143,20 +139,19 @@ axiosInstance.interceptors.response.use(
 );
 
 export const http = {
+	delete: <T>(url: string, config?: AxiosRequestConfig): Promise<T> =>
+		axiosInstance.delete<T>(url, config).then((res) => res.data),
 	get: <T>(url: string, config?: AxiosRequestConfig): Promise<T> =>
 		axiosInstance.get<T>(url, config).then((res) => res.data),
+
+	patch: <T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> =>
+		axiosInstance.patch<T>(url, data, config).then((res) => res.data),
 
 	post: <T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> =>
 		axiosInstance.post<T>(url, data, config).then((res) => res.data),
 
 	put: <T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> =>
 		axiosInstance.put<T>(url, data, config).then((res) => res.data),
-
-	patch: <T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> =>
-		axiosInstance.patch<T>(url, data, config).then((res) => res.data),
-
-	delete: <T>(url: string, config?: AxiosRequestConfig): Promise<T> =>
-		axiosInstance.delete<T>(url, config).then((res) => res.data),
 };
 
 export { axiosInstance };

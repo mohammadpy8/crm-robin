@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useState } from "react";
 import type { SortingState } from "@tanstack/react-table";
+import { useCallback, useState } from "react";
 
 export const useTableSort = (
 	onSortChange?: (sortField: string | null, sortOrder: "asc" | "desc" | null) => void,
@@ -33,5 +33,5 @@ export const useTableSort = (
 		[onSortChange],
 	);
 
-	return { sorting, setSorting, handleSort };
+	return { handleSort, setSorting, sorting };
 };

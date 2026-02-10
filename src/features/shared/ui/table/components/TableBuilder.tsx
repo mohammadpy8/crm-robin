@@ -4,11 +4,11 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { useCallback, useMemo, useRef } from "react";
 import {
+	useSyncScroll,
 	useTableFilters,
 	useTablePagination,
 	useTableSelection,
 	useTableSort,
-	useSyncScroll,
 } from "../hooks";
 import type { ColumnConfig, TableBuilderProps, TableRow } from "../types";
 import { TableBody } from "./body";
@@ -38,18 +38,18 @@ export const TableBuilder = ({
 	const { sorting, handleSort } = useTableSort(onSortChange);
 	const { setFilter, getFilter, getAllFilters } = useTableFilters();
 	const { currentPage, totalPages, handlePageChange } = useTablePagination({
-		itemsPerPage,
-		totalItems,
 		dataLength: data.length,
 		externalCurrentPage,
+		itemsPerPage,
 		onPageChange,
+		totalItems,
 	});
 	const { rowSelection, handleRowSelection, handleSelectAll } = useTableSelection({
+		currentPage,
 		data,
+		itemsPerPage,
 		multiSelect,
 		onSelectionChange,
-		currentPage,
-		itemsPerPage,
 	});
 
 	useSyncScroll(headerScrollRef, scrollContainerRef);
@@ -151,8 +151,8 @@ export const TableBuilder = ({
 		manualPagination: true,
 		manualSorting: true,
 		state: {
-			sorting,
 			rowSelection,
+			sorting,
 		},
 	});
 
@@ -188,8 +188,8 @@ export const TableBuilder = ({
 
 				<TableBody
 					columnConfigs={columnConfigs}
-					columnWidths={columnWidths}
 					columns={columns}
+					columnWidths={columnWidths}
 					currentPage={currentPage}
 					data={data}
 					itemsPerPage={itemsPerPage}

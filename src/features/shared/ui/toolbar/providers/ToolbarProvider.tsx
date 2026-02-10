@@ -1,7 +1,10 @@
 "use client";
 
 import { createContext, type ReactNode, useState } from "react";
-import type { FilterOption, ToolbarContextValue } from "@/features/shared/ui/toolbar/types/toolbar.types";
+import type {
+	FilterOption,
+	ToolbarContextValue,
+} from "@/features/shared/ui/toolbar/types/toolbar.types";
 
 export const ToolbarContext = createContext<ToolbarContextValue | undefined>(undefined);
 

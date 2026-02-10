@@ -1,14 +1,10 @@
-/** biome-ignore-all lint/style/useImportType: <> */
-/** biome-ignore-all assist/source/organizeImports: <> */
-
-import {
-	TableRow,
-	FilterValue,
-	TableBuilder,
-	ColumnConfig,
-} from "@/features/shared/ui/table";
-
 import { useCallback, useState } from "react";
+import {
+	type ColumnConfig,
+	type FilterValue,
+	TableBuilder,
+	type TableRow,
+} from "@/features/shared/ui/table";
 
 export default function TableBuilderExample() {
 	const [mockData] = useState<TableRow[]>([
@@ -132,7 +128,6 @@ export default function TableBuilderExample() {
 	]);
 
 	const columnConfig: ColumnConfig[] = [
-		
 		{
 			accessorKey: "phone",
 			enableFiltering: true,

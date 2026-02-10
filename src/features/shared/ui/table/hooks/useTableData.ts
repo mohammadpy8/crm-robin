@@ -1,7 +1,7 @@
 "use client";
 
-import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
-import type { TableRow, FilterValue } from "../types";
+import { type UseQueryOptions, useQuery } from "@tanstack/react-query";
+import type { FilterValue, TableRow } from "../types";
 
 interface TableDataParams {
 	page: number;
@@ -30,8 +30,8 @@ export const useTableData = ({
 	options,
 }: UseTableDataProps) => {
 	return useQuery<TableDataResponse>({
-		queryKey: [...queryKey, params],
 		queryFn: () => queryFn(params),
+		queryKey: [...queryKey, params],
 		...options,
 	});
 };

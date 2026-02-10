@@ -1,8 +1,6 @@
-/** biome-ignore-all assist/source/useSortedKeys: <> */
-/** biome-ignore-all assist/source/organizeImports: <> */
+import type { AxiosError } from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import type { AxiosError } from "axios";
 import { authService } from "@/api/services";
 import type { LoginRequest, LoginResponse } from "@/api/types";
 
@@ -46,11 +44,10 @@ export const useAuth = (options?: UseAuthOptions): UseAuthReturn => {
 
 			options?.onLoginSuccess?.(response);
 
-			await new Promise(resolve => setTimeout(resolve, 150));
+			await new Promise((resolve) => setTimeout(resolve, 150));
 
 			const redirectUrl = options?.callbackUrl || "/users/list";
 			window.location.href = redirectUrl;
-
 		} catch (err) {
 			const axiosError = err as AxiosError<{
 				message?: string;
@@ -98,10 +95,10 @@ export const useAuth = (options?: UseAuthOptions): UseAuthReturn => {
 	};
 
 	return {
-		login,
-		isLoading,
 		error,
+		isLoading,
 		isSuccess,
+		login,
 		logout,
 		reset,
 	};

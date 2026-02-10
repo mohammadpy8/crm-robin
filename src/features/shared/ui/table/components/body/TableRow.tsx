@@ -1,9 +1,9 @@
 "use client";
 
 import { Checkbox } from "@heroui/react";
+import type { ColumnDef } from "@tanstack/react-table";
 import { Edit, Eye } from "@/icons";
 import type { ColumnConfig, TableRow as TableRowType } from "../../types";
-import type { ColumnDef } from "@tanstack/react-table";
 
 interface TableRowProps {
 	row: TableRowType;

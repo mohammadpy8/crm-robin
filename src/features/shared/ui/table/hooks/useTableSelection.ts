@@ -65,9 +65,9 @@ export const useTableSelection = ({
 	}, [data, onSelectionChange, rowSelection]);
 
 	return {
-		rowSelection,
-		setRowSelection,
 		handleRowSelection,
 		handleSelectAll,
+		rowSelection,
+		setRowSelection,
 	};
 };

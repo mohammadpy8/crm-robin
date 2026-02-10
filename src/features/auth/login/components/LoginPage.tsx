@@ -1,7 +1,7 @@
 import { Suspense } from "react";
-import { LoginImage } from "./LoginImage";
 import LoginFormSkeleton from "./FormSkeleton";
 import { LoginForm } from "./LoginForm";
+import { LoginImage } from "./LoginImage";
 
 export default function LoginPage() {
 	return (

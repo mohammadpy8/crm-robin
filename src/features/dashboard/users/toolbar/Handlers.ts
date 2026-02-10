@@ -1,26 +1,7 @@
 /** biome-ignore-all lint/style/useDefaultSwitchClause: <> */
-/** biome-ignore-all assist/source/useSortedKeys: <> */
-/** biome-ignore-all assist/source/useSortedKeys: <> */ 
-import type  { ToolbarHandlers } from "@/features/shared/ui/toolbar";
-
+import type { ToolbarHandlers } from "@/features/shared/ui/toolbar";
 
 const toolbarHandlers: ToolbarHandlers = {
-	onCreateClick: () => {
-		console.log("Create new user");
-	},
-	onCreateDropdownClick: (option) => {
-		console.log("Create dropdown option clicked:", option);
-	},
-	onFilterChange: (value, label) => {
-		console.log("Filter changed:", value, label);
-	},
-	onMoreClick: () => {
-		console.log("More button clicked");
-	},
-	onMoreOptionClick: (option) => {
-		console.log("More option clicked:", option.value);
-		option.onClick?.();
-	},
 	onActionButtonClick: (buttonId) => {
 		console.log("Action button clicked:", buttonId);
 
@@ -44,7 +25,22 @@ const toolbarHandlers: ToolbarHandlers = {
 			console.log("Assigned to:", selectedValues);
 		}
 	},
+	onCreateClick: () => {
+		console.log("Create new user");
+	},
+	onCreateDropdownClick: (option) => {
+		console.log("Create dropdown option clicked:", option);
+	},
+	onFilterChange: (value, label) => {
+		console.log("Filter changed:", value, label);
+	},
+	onMoreClick: () => {
+		console.log("More button clicked");
+	},
+	onMoreOptionClick: (option) => {
+		console.log("More option clicked:", option.value);
+		option.onClick?.();
+	},
 };
-
 
 export default toolbarHandlers;

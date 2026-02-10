@@ -3,15 +3,11 @@
 import { BottomToolbar } from "./components/BottomToolbar";
 import { TopToolbar } from "./components/TopToolbar";
 import { useToolbarContext } from "./hooks/useToolbarContext";
-import type {
-	FilterOption,
-	ToolbarConfig,
-	ToolbarHandlers,
-} from "./types/toolbar.types";
+import type { FilterOption, ToolbarConfig, ToolbarHandlers } from "./types/toolbar.types";
 
 interface ToolbarProps {
 	config: ToolbarConfig;
-	handlers?: ToolbarHandlers; 
+	handlers?: ToolbarHandlers;
 }
 
 export const Toolbar: React.FC<ToolbarProps> = ({ config, handlers = {} }) => {

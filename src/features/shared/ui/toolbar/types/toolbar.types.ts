@@ -16,12 +16,7 @@ export interface ActionButtonOption {
 	value: string;
 }
 
-
-export type ActionButtonVisibility = 
-	| "always"    
-	| "single"  
-	| "multiple"
-	| "any";
+export type ActionButtonVisibility = "always" | "single" | "multiple" | "any";
 
 export interface ActionButton {
 	id: string;

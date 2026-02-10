@@ -1,11 +1,11 @@
 export interface UserFormData {
 	[key: string]: string | undefined;
 	id?: string;
-	fullName: string; // نام کامل *
-	mobile: string; // موبایل *
-	password: string; // رمز ورود *
-	email: string; // ایمیل *
-	role?: string; // نقش کاربری
+	fullName: string;
+	mobile: string;
+	password: string;
+	email: string;
+	role?: string;
 }
 
 export interface UserFormContainerProps {

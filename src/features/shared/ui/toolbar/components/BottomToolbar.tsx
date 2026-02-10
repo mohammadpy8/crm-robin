@@ -5,8 +5,8 @@ import { PageTitle } from "@/features/shared/ui/toolbar/components/PageTitle";
 import { ViewButtonGroup } from "@/features/shared/ui/toolbar/components/ViewButtonGroup";
 import type {
 	ActionButton,
-	ViewButton,
 	ToolbarHandlers,
+	ViewButton,
 } from "@/features/shared/ui/toolbar/types/toolbar.types";
 
 interface BottomToolbarProps {

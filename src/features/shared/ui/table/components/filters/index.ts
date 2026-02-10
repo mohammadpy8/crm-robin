@@ -1,3 +1,3 @@
-export { TextFilter } from "./TextFilter";
-export { SelectFilter } from "./SelectFilter";
 export { DateRangeFilter } from "./DateRangeFilter";
+export { SelectFilter } from "./SelectFilter";
+export { TextFilter } from "./TextFilter";

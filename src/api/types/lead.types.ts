@@ -16,7 +16,6 @@ export enum LeadSource {
 	ETC = "etc",
 }
 
-
 export interface CreateLeadDto {
 	firstName: string;
 	lastName: string;
@@ -105,7 +104,6 @@ export interface LeadQueryParams {
 	source?: LeadSource;
 	assignedToUserId?: number;
 }
-
 
 export interface PaginatedLeadsResponse {
 	data: LeadEntity[];

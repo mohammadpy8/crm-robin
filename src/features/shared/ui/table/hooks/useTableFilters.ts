@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import type { FilterValue, FilterState } from "../types";
+import type { FilterState, FilterValue } from "../types";
 
 export const useTableFilters = () => {
 	const filterInputsRef = useRef<FilterState>({});
@@ -25,5 +25,5 @@ export const useTableFilters = () => {
 		return filterInputsRef.current;
 	}, []);
 
-	return { setFilter, getFilter, clearFilters, getAllFilters };
+	return { clearFilters, getAllFilters, getFilter, setFilter };
 };

@@ -7,7 +7,6 @@ export enum ContactPosition {
 	OTHER = "other",
 }
 
-
 export interface CreateContactDto {
 	firstName?: string;
 	lastName: string;
@@ -48,7 +47,6 @@ export interface UploadContactsExcelDto {
 	assignedToUserId?: number;
 }
 
-
 export interface ContactEntity {
 	id: number;
 	firstName?: string;
@@ -63,7 +61,6 @@ export interface ContactEntity {
 	updatedAt: string;
 }
 
-
 export interface ContactQueryParams {
 	firstName?: string;
 	lastName?: string;
@@ -77,7 +74,6 @@ export interface ContactQueryParams {
 	sortField?: "createdAt" | "updatedAt" | "firstName" | "lastName" | "email" | "phone";
 	sortOrder?: "ASC" | "DESC";
 }
-
 
 export interface PaginatedContactsResponse {
 	data: ContactEntity[];

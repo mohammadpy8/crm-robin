@@ -15,7 +15,7 @@ export type {
 	FilterState,
 	FilterType,
 	FilterValue,
+	SelectOption,
 	TableBuilderProps,
 	TableRow,
-	SelectOption,
 } from "./types";

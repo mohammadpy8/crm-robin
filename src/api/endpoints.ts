@@ -1,52 +1,49 @@
-/** biome-ignore-all assist/source/useSortedKeys: <> */
 export const ENDPOINTS = {
 	AUTH: {
+		BY_ID: (id: number) => `/auth/${id}`,
+		LIST: "/auth/list",
+		PROFILE: "/auth/profile",
+		REFRESH: "/auth/refresh",
 		SIGNIN: "/auth/signin",
 		SIGNUP: "/auth/signup",
-		REFRESH: "/auth/refresh",
-		PROFILE: "/auth/profile",
-		LIST: "/auth/list",
-		BY_ID: (id: number) => `/auth/${id}`,
 		UPDATE_PASSWORD: (id: number) => `/auth/updatepassword/${id}`,
 		UPDATE_ROLE: (id: number) => `/auth/role/${id}`,
 	},
-	LEAD: {
-		BASE: "/lead",
-		BY_ID: (id: number) => `/lead/${id}`,
-		ASSIGN: (id: number) => `/lead/${id}/assign`,
-		CONVERT: (id: number) => `/lead/${id}/convert`,
-		STATUS: (id: number) => `/lead/${id}/status`,
-		BULK_ASSIGN: "/lead/bulk-assign",
-		BULK_DELETE: "/lead/bulk-delete",
-		BULK_STATUS: "/lead/bulk-change-status",
-		IMPORT: "/lead/import-excel",
+
+	COMPANY: {
+		ASSIGN: (id: number) => `/company/${id}/assign`,
+		BASE: "/company",
+		BULK_ASSIGN: "/company/bulk-assign",
+		BULK_DELETE: "/company/bulk-delete",
+		BULK_LEVEL: "/company/bulk-change-level",
+		BULK_STATUS: "/company/bulk-change-status",
+		BY_ID: (id: number) => `/company/${id}`,
+		IMPORT: "/company/import-excel",
+		LEVEL: (id: number) => `/company/${id}/level`,
+		LIST: "/company/list",
+		STATUS: (id: number) => `/company/${id}/status`,
 	},
 
 	CONTACT: {
-		BASE: "/contact",
-		BY_ID: (id: number) => `/contact/${id}`,
-		LIST: "/contact/list",
 		ASSIGN: (id: number) => `/contact/${id}/assign`,
+		BASE: "/contact",
 		BULK_ASSIGN: "/contact/bulk-assign",
 		BULK_DELETE: "/contact/bulk-delete",
+		BY_ID: (id: number) => `/contact/${id}`,
 		IMPORT: "/contact/import-excel",
+		LIST: "/contact/list",
 	},
-
-	COMPANY: {
-		BASE: "/company",
-		BY_ID: (id: number) => `/company/${id}`,
-		LIST: "/company/list",
-		ASSIGN: (id: number) => `/company/${id}/assign`,
-		STATUS: (id: number) => `/company/${id}/status`,
-		LEVEL: (id: number) => `/company/${id}/level`,
-		BULK_ASSIGN: "/company/bulk-assign",
-		BULK_DELETE: "/company/bulk-delete",
-		BULK_STATUS: "/company/bulk-change-status",
-		BULK_LEVEL: "/company/bulk-change-level",
-		IMPORT: "/company/import-excel",
+	LEAD: {
+		ASSIGN: (id: number) => `/lead/${id}/assign`,
+		BASE: "/lead",
+		BULK_ASSIGN: "/lead/bulk-assign",
+		BULK_DELETE: "/lead/bulk-delete",
+		BULK_STATUS: "/lead/bulk-change-status",
+		BY_ID: (id: number) => `/lead/${id}`,
+		CONVERT: (id: number) => `/lead/${id}/convert`,
+		IMPORT: "/lead/import-excel",
+		STATUS: (id: number) => `/lead/${id}/status`,
 	},
-
-
 } as const;
 
 export type AuthEndpoints = typeof ENDPOINTS.AUTH;

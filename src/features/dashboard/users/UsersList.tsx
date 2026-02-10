@@ -1,7 +1,3 @@
-/** biome-ignore-all assist/source/useSortedAttributes: <> */
-/** biome-ignore-all assist/source/organizeImports: <> */
-/** biome-ignore-all assist/source/useSortedKeys: <> */
-/** biome-ignore-all lint/style/useDefaultSwitchClause: <> */
 "use client";
 
 import { Suspense } from "react";
@@ -10,10 +6,10 @@ import {
 	ToolbarProvider,
 	useToolbarContext,
 } from "@/features/shared/ui/toolbar";
+import TableBuilderExample from "../accounts/TableExample";
 import { UsersFormContainer } from "./form";
 import { usersToolbarConfig } from "./toolbar";
 import toolbarHandlers from "./toolbar/Handlers";
-import TableBuilderExample from "../accounts/TableExample";
 
 function UsersContent() {
 	const { selectedCount, selectedFilter, setSelectedCount } = useToolbarContext();
@@ -32,7 +28,7 @@ function UsersContent() {
 
 	return (
 		<>
-			<UsersFormContainer isOpen={false} onSubmit={onSubmitForm} onClose={onCloseForm} />
+			<UsersFormContainer isOpen={false} onClose={onCloseForm} onSubmit={onSubmitForm} />
 
 			<div className="w-full">
 				<Toolbar config={usersToolbarConfig} handlers={toolbarHandlers} />

@@ -100,7 +100,6 @@ export interface CompanyQueryParams {
 	sortOrder?: "ASC" | "DESC";
 }
 
-
 export interface PaginatedCompaniesResponse {
 	data: CompanyEntity[];
 	meta: {

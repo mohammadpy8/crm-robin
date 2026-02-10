@@ -2,12 +2,12 @@
 
 import React, {
 	createContext,
+	type ReactNode,
+	useCallback,
 	useContext,
 	useState,
-	useCallback,
-	type ReactNode,
 } from "react";
-import type { FilterValue, FilterState } from "../types";
+import type { FilterState, FilterValue } from "../types";
 
 interface TableContextValue {
 	filters: FilterState;
@@ -44,13 +44,13 @@ export const TableProvider = ({ children }: TableProviderProps) => {
 	return (
 		<TableContext.Provider
 			value={{
-				filters,
-				setFilter,
 				clearFilters,
-				rowSelection,
-				setRowSelection,
 				currentPage,
+				filters,
+				rowSelection,
 				setCurrentPage,
+				setFilter,
+				setRowSelection,
 			}}
 		>
 			{children}
