@@ -3,7 +3,6 @@ import { Delete, Dots } from "@/icons";
 import Update from "@/icons/path/Update";
 
 const usersToolbarConfig = {
-	// ==================== Action Buttons ====================
 	actionButtons: [
 		{
 			className:
@@ -34,8 +33,6 @@ const usersToolbarConfig = {
 			visibility: "any" as const,
 		},
 	],
-
-	// ==================== Create Button ====================
 	createButton: {
 		className:
 			"focus:outline-none focus:ring-0 active:scale-95 active:shadow-inner transition-all duration-150 ease-in-out",
@@ -43,7 +40,6 @@ const usersToolbarConfig = {
 		label: "ایجاد کاربر",
 	},
 
-	// ==================== Filter Button ====================
 	filterButton: {
 		defaultLabel: "همه کاربران",
 		icon: <Menu className="h-4 w-4" />,
@@ -56,7 +52,6 @@ const usersToolbarConfig = {
 		],
 	},
 
-	// ==================== More Button ====================
 	moreButton: {
 		label: "بیشتر",
 		options: [
@@ -79,14 +74,13 @@ const usersToolbarConfig = {
 		],
 	},
 
-	// ==================== Page Title ====================
 	pageTitle: {
 		icon: <Users className="h-7 w-7 text-primary" />,
 		title: "کاربران",
 	},
 
 	showSelectionCount: false,
-	// ==================== View Buttons ====================
+
 	viewButtons: [
 		{
 			active: true,

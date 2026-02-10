@@ -1,1 +1,1 @@
-export { default as usersToolbarConfig } from "./Config";
+export { default as UsersToolbarContainer } from "./Container";

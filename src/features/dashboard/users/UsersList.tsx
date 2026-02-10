@@ -1,23 +1,12 @@
 "use client";
 
 import { Suspense } from "react";
-import {
-	Toolbar,
-	ToolbarProvider,
-	useToolbarContext,
-} from "@/features/shared/ui/toolbar";
-import TableBuilderExample from "../accounts/TableExample";
+import { ToolbarProvider } from "@/features/shared/ui/toolbar";
 import { UsersFormContainer } from "./form";
-import { usersToolbarConfig } from "./toolbar";
-import toolbarHandlers from "./toolbar/Handlers";
+import { UsersTableContainer } from "./table";
+import UsersToolbarContainer from "./toolbar/Container";
 
-function UsersContent() {
-	const { selectedCount, selectedFilter, setSelectedCount } = useToolbarContext();
-
-	console.log("Selected Filter is:", selectedFilter.value);
-	console.log("Selected Count:", selectedCount);
-	setSelectedCount(1);
-
+export default function UsersList() {
 	function onSubmitForm() {
 		console.log("form submitted");
 	}
@@ -28,23 +17,22 @@ function UsersContent() {
 
 	return (
 		<>
-			<UsersFormContainer isOpen={false} onClose={onCloseForm} onSubmit={onSubmitForm} />
+			<UsersFormContainer
+				initialValues={{ email: "maliasadi@gmail.com" }}
+				isOpen={false}
+				onClose={onCloseForm}
+				onSubmit={onSubmitForm}
+			/>
 
-			<div className="w-full">
-				<Toolbar config={usersToolbarConfig} handlers={toolbarHandlers} />
+			<ToolbarProvider defaultFilter={{ label: "همه کاربران", value: "all" }}>
+				<UsersToolbarContainer />
+			</ToolbarProvider>
+
+			<div>
+				<Suspense fallback={<div>در حال بارگذاری...</div>}>
+					<UsersTableContainer />
+				</Suspense>
 			</div>
-
-			<Suspense fallback={<div>در حال بارگذاری...</div>}>
-				<TableBuilderExample />
-			</Suspense>
 		</>
-	);
-}
-
-export default function UsersList() {
-	return (
-		<ToolbarProvider defaultFilter={{ label: "همه کاربران", value: "all" }}>
-			<UsersContent />
-		</ToolbarProvider>
 	);
 }

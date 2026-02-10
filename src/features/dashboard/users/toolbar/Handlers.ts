@@ -42,5 +42,5 @@ const toolbarHandlers: ToolbarHandlers = {
 		option.onClick?.();
 	},
 };
-
+ 
 export default toolbarHandlers;

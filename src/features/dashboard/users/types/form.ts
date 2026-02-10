@@ -1,10 +1,10 @@
 export interface UserFormData {
 	[key: string]: string | undefined;
 	id?: string;
-	fullName: string;
-	mobile: string;
-	password: string;
-	email: string;
+	fullName?: string;
+	mobile?: string;
+	password?: string;
+	email?: string;
 	role?: string;
 }
 

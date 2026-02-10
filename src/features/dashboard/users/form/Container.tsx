@@ -3,7 +3,7 @@ import type {
 	UserFormData,
 } from "@/features/dashboard/users/types";
 import { FormBuilder } from "@/features/shared/ui/formbuilder";
-import { UsersFormConfig } from "./Config";
+import { UsersFormConfig } from "./config";
 
 export default function UsersFormContainer({
 	isOpen,
