@@ -10,7 +10,7 @@ export interface LoginResponse {
 
 export interface SignupDto {
 	phoneNumber: string;
-	email?: string;
+	email: string;
 	fullName: string;
 	password: string;
 }
@@ -31,12 +31,9 @@ export interface UpdateRoleDto {
 
 export interface UserEntity {
 	id: number;
-	phoneNumber: string;
-	email?: string;
-	fullName: string;
-	roleId?: number;
-	createdAt?: string;
-	updatedAt?: string;
+	email: string;
+	role: number;
+	permissions: [];
 }
 
 export interface UserListItem {

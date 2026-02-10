@@ -1,3 +1,6 @@
+/** biome-ignore-all lint/suspicious/useAwait: <> */
+/** biome-ignore-all assist/source/organizeImports: <> */
+/** biome-ignore-all assist/source/useSortedKeys: <> */
 import { API_CONFIG } from "@/api/core/config";
 import { http } from "@/api/core/httpClient";
 import { cookieManager } from "@/lib/utils/cookie";
@@ -48,12 +51,8 @@ export const authService = {
 		return http.get<UserListItem[]>(API_CONFIG.ENDPOINTS.AUTH.LIST);
 	},
 
-	getUserById: async (id: number): Promise<UserEntity> => {
-		return http.get<UserEntity>(API_CONFIG.ENDPOINTS.AUTH.BY_ID(id));
-	},
-
-	updateUser: async (id: number, data: UpdateUserDto): Promise<UserEntity> => {
-		return http.patch<UserEntity>(API_CONFIG.ENDPOINTS.AUTH.BY_ID(id), data);
+	updateUser: async (id: number, data: UpdateUserDto): Promise<void> => {
+		return http.patch<void>(API_CONFIG.ENDPOINTS.AUTH.BY_ID(id), data);
 	},
 
 	deleteUser: async (id: number): Promise<void> => {

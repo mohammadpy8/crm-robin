@@ -1,3 +1,5 @@
+/** biome-ignore-all assist/source/useSortedKeys: <> */
+/** biome-ignore-all assist/source/organizeImports: <> */
 import axios, {
 	type AxiosError,
 	type AxiosInstance,
@@ -8,7 +10,7 @@ import { API_CONFIG } from "./config";
 import { cookieManager } from "../../lib/utils/cookie";
 
 interface ApiErrorResponse {
-	message: string;
+	message: string | string[];
 	statusCode?: number;
 	errors?: Record<string, string[]>;
 }
@@ -21,6 +23,27 @@ interface QueueItem {
 	resolve: (value: unknown) => void;
 	reject: (reason: unknown) => void;
 }
+
+export const getErrorMessage = (error: unknown): string => {
+	if (axios.isAxiosError(error)) {
+		const axiosError = error as AxiosError<ApiErrorResponse>;
+		const serverMessage = axiosError.response?.data?.message;
+		
+		if (serverMessage) {
+			return Array.isArray(serverMessage) 
+				? serverMessage.join(", ") 
+				: serverMessage;
+		}
+		
+		return axiosError.message || "خطای ناشناخته";
+	}
+	
+	if (error instanceof Error) {
+		return error.message;
+	}
+	
+	return "خطای ناشناخته";
+};
 
 let isRefreshing = false;
 let failedQueue: QueueItem[] = [];
