@@ -5,11 +5,10 @@ import usersToolbarConfig from "./config";
 import toolbarHandlers from "./handlers";
 
 export default function UsersToolbarContainer() {
-	const { selectedCount, selectedFilter, setSelectedCount } = useToolbarContext();
+	const { selectedCount, selectedFilter } = useToolbarContext();
 
 	console.log("Selected Filter is:", selectedFilter.value);
 	console.log("Selected Count:", selectedCount);
-	setSelectedCount(1);
 
 	return (
 		<div className="w-full">

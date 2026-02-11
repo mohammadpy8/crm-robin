@@ -168,12 +168,8 @@ export const TableBuilder = ({
 		return Object.keys(rowSelection).length > 0 && !allRowsSelected;
 	}, [rowSelection, allRowsSelected]);
 
-	if (loading) {
-		return <LoadingState />;
-	}
-
 	return (
-		<div className="flex h-full flex-col rounded-2xl bg-primary p-3" dir="rtl">
+		<div className="mx-4 flex h-[calc(100vh-12rem)] flex-col rounded-2xl bg-primary p-3" dir="rtl">
 			<div className="flex min-h-0 flex-1 flex-col">
 				<TableHeader
 					allRowsSelected={allRowsSelected}
@@ -186,20 +182,24 @@ export const TableBuilder = ({
 					someRowsSelected={someRowsSelected}
 				/>
 
-				<TableBody
-					columnConfigs={columnConfigs}
-					columns={columns}
-					columnWidths={columnWidths}
-					currentPage={currentPage}
-					data={data}
-					itemsPerPage={itemsPerPage}
-					onRowEdit={onRowEdit}
-					onRowSelection={handleRowSelection}
-					onRowView={onRowView}
-					renderCellContent={renderCellContent}
-					rowSelection={rowSelection}
-					scrollContainerRef={scrollContainerRef}
-				/>
+				{loading ? (
+					<LoadingState columnWidths={columnWidths} itemsPerPage={itemsPerPage} />
+				) : (
+					<TableBody
+						columnConfigs={columnConfigs}
+						columns={columns}
+						columnWidths={columnWidths}
+						currentPage={currentPage}
+						data={data}
+						itemsPerPage={itemsPerPage}
+						onRowEdit={onRowEdit}
+						onRowSelection={handleRowSelection}
+						onRowView={onRowView}
+						renderCellContent={renderCellContent}
+						rowSelection={rowSelection}
+						scrollContainerRef={scrollContainerRef}
+					/>
+				)}
 			</div>
 
 			<TablePagination

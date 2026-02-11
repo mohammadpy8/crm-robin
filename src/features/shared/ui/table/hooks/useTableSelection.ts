@@ -22,14 +22,15 @@ export const useTableSelection = ({
 
 	const handleRowSelection = useCallback(
 		(index: number, checked: boolean) => {
-			if (multiSelect) {
-				setRowSelection((prev) => ({
-					...prev,
-					[index]: checked,
-				}));
-			} else {
-				setRowSelection({ [index]: checked });
-			}
+			setRowSelection((prev) => {
+				if (multiSelect) {
+					return {
+						...prev,
+						[index]: checked,
+					};
+				}
+				return { [index]: checked };
+			});
 		},
 		[multiSelect],
 	);
@@ -37,14 +38,17 @@ export const useTableSelection = ({
 	const handleSelectAll = useCallback(
 		(checked: boolean) => {
 			if (multiSelect) {
-				const newSelection: Record<string, boolean> = {};
-				if (checked) {
+				setRowSelection((prev) => {
+					if (!checked) {
+						return {};
+					}
+					const newSelection: Record<string, boolean> = { ...prev };
 					data.forEach((_, index) => {
 						const globalIndex = (currentPage - 1) * itemsPerPage + index;
 						newSelection[globalIndex] = true;
 					});
-				}
-				setRowSelection(newSelection);
+					return newSelection;
+				});
 			}
 		},
 		[data, multiSelect, currentPage, itemsPerPage],
@@ -52,17 +56,24 @@ export const useTableSelection = ({
 
 	useEffect(() => {
 		if (onSelectionChange) {
-			const selectedIds = Object.keys(rowSelection)
-				.filter((key) => rowSelection[key])
+			const selectedIndices = Object.keys(rowSelection).filter(
+				(key) => rowSelection[key],
+			);
+			const selectedIds = selectedIndices
 				.map((index) => {
-					const dataIndex = Number.parseInt(index, 10);
-					return data[dataIndex]?.id;
+					const pageIndex = Number.parseInt(index, 10) % itemsPerPage;
+					const page = Math.floor(Number.parseInt(index, 10) / itemsPerPage) + 1;
+
+					if (page === currentPage && data[pageIndex]) {
+						return data[pageIndex].id;
+					}
+					return;
 				})
 				.filter((id): id is number => id !== undefined);
 
 			onSelectionChange(selectedIds);
 		}
-	}, [data, onSelectionChange, rowSelection]);
+	}, [data, onSelectionChange, rowSelection, currentPage, itemsPerPage]);
 
 	return {
 		handleRowSelection,

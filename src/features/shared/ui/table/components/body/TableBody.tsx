@@ -1,8 +1,8 @@
 "use client";
 
+import type { ColumnDef } from "@tanstack/react-table";
 import type { RefObject } from "react";
 import type { ColumnConfig, TableRow as TableRowType } from "../../types";
-import type { ColumnDef } from "@tanstack/react-table";
 import { TableRow } from "./TableRow";
 
 interface TableBodyProps {
@@ -65,7 +65,7 @@ export const TableBody = ({
 							);
 						})
 					) : (
-						<div className="shrink-0 rounded-lg bg-white p-6 text-center">
+						<div className="flex h-full min-h-100 items-center justify-center rounded-lg bg-white">
 							<p className="text-gray-500 text-xs">نتیجه‌ای یافت نشد</p>
 						</div>
 					)}
