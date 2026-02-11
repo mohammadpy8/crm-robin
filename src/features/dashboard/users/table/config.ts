@@ -1,6 +1,20 @@
 import type { ColumnConfig } from "@/features/shared/ui/table";
 
-export const columnConfig: ColumnConfig[] = [
+type RoleOption = {
+	label: string;
+	value: string;
+};
+
+export const getUsersColumnConfig = (roleOptions: RoleOption[]): ColumnConfig[] => [
+	{
+		accessorKey: "fullName",
+		enableFiltering: true,
+		enableSorting: true,
+		filterType: "text",
+		header: "نام کامل",
+		size: 200,
+		sortableFieldName: "fullName",
+	},
 	{
 		accessorKey: "phone",
 		enableFiltering: true,
@@ -8,29 +22,23 @@ export const columnConfig: ColumnConfig[] = [
 		filterType: "text",
 		header: "تلفن",
 		size: 140,
-		sortableFieldName: "phone",
 	},
 	{
 		accessorKey: "email",
 		enableFiltering: true,
-		enableSorting: true,
+		enableSorting: false,
 		filterType: "text",
 		header: "ایمیل",
 		size: 200,
-		sortableFieldName: "email",
 	},
 	{
 		accessorKey: "role",
-		enableFiltering: true,
-		enableSorting: true,
-		filterType: "select-multi",
+		enableFiltering: false,
+		enableSorting: false,
+		filterType: "select-single",
 		header: "نقش کاربری",
-		selectOptions: [
-			{ label: "کارآموز", value: "caramoz" },
-			{ label: "ادمین", value: "admin" },
-		],
+		selectOptions: roleOptions,
 		size: 150,
-		sortableFieldName: "position",
 	},
 	{
 		accessorKey: "status",
@@ -47,31 +55,20 @@ export const columnConfig: ColumnConfig[] = [
 				textColor: "#ffffff",
 				value: "inactive",
 			},
-			pending: {
-				bgColor: "#f59e0b",
-				label: "در انتظار",
-				textColor: "#ffffff",
-				value: "pending",
-			},
 		},
-		enableFiltering: true,
-		enableSorting: true,
+		enableFiltering: false,
+		enableSorting: false,
 		filterType: "select-single",
 		header: "وضعیت",
-		selectOptions: [
-			{ label: "فعال", value: "active" },
-			{ label: "غیرفعال", value: "inactive" },
-			{ label: "در انتظار", value: "pending" },
-		],
 		size: 140,
 	},
 	{
-		accessorKey: "date",
-		enableFiltering: true,
+		accessorKey: "createdAt",
+		enableFiltering: false,
 		enableSorting: true,
 		filterType: "date-range",
 		header: "تاریخ ایجاد",
-		size: 160,
-		sortableFieldName: "createdAt",
+		selectOptions: roleOptions,
+		size: 150,
 	},
 ];

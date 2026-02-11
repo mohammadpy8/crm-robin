@@ -1,28 +1,22 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { ToolbarProvider } from "@/features/shared/ui/toolbar";
+import { useRoleStore } from "@/store/useRoleStore";
 import { UsersFormContainer } from "./form";
 import { UsersTableContainer } from "./table";
 import UsersToolbarContainer from "./toolbar/Container";
 
 export default function UsersList() {
-	function onSubmitForm() {
-		console.log("form submitted");
-	}
+	const { fetchRoles } = useRoleStore();
 
-	function onCloseForm() {
-		console.log("form closed");
-	}
+	useEffect(() => {
+		fetchRoles();
+	}, [fetchRoles]);
 
 	return (
 		<>
-			<UsersFormContainer
-				initialValues={{ email: "maliasadi@gmail.com" }}
-				isOpen={false}
-				onClose={onCloseForm}
-				onSubmit={onSubmitForm}
-			/>
+			<UsersFormContainer />
 
 			<ToolbarProvider defaultFilter={{ label: "همه کاربران", value: "all" }}>
 				<UsersToolbarContainer />

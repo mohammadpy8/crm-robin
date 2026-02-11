@@ -1,7 +1,9 @@
 import type { FormConfig } from "@/features/shared/ui/formbuilder";
 import { ValidationSchemas } from "@/features/shared/ui/formbuilder";
 
-export const UsersFormConfig: FormConfig = {
+export const getUsersFormConfig = (
+	roleOptions: { label: string; value: string }[],
+): FormConfig => ({
 	rows: [
 		{
 			fields: [
@@ -16,9 +18,10 @@ export const UsersFormConfig: FormConfig = {
 				{
 					label: "نقش کاربری",
 					name: "role",
+					options: roleOptions,
 					placeholder: "نقش کاربری",
 					required: false,
-					type: "text" as const,
+					type: "select" as const,
 				},
 			],
 		},
@@ -37,8 +40,8 @@ export const UsersFormConfig: FormConfig = {
 					name: "password",
 					placeholder: "رمز ورود",
 					required: true,
-					type: "password" as const,
-					validation: ValidationSchemas.minLength(8, "رمز ورود"),
+					type: "text" as const,
+					validation: ValidationSchemas.minLength(6, "رمز ورود"),
 				},
 			],
 		},
@@ -59,4 +62,4 @@ export const UsersFormConfig: FormConfig = {
 	submitButton: {
 		text: "تایید",
 	},
-};
+});

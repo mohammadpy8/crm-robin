@@ -44,9 +44,13 @@ export const ENDPOINTS = {
 		IMPORT: "/lead/import-excel",
 		STATUS: (id: number) => `/lead/${id}/status`,
 	},
+	ROLE: {
+		BASE: "/role",
+	},
 } as const;
 
 export type AuthEndpoints = typeof ENDPOINTS.AUTH;
 export type LeadEndpoints = typeof ENDPOINTS.LEAD;
 export type ContactEndpoints = typeof ENDPOINTS.CONTACT;
 export type CompanyEndpoints = typeof ENDPOINTS.COMPANY;
+export type RoleEndpoints = typeof ENDPOINTS.ROLE;
