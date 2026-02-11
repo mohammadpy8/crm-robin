@@ -169,7 +169,7 @@ export const TableBuilder = ({
 	}, [rowSelection, allRowsSelected]);
 
 	return (
-		<div className="mx-4 flex h-[calc(100vh-12rem)] flex-col rounded-2xl bg-primary p-3" dir="rtl">
+		<div className="mx-10 flex h-[calc(100vh-15rem)] flex-col rounded-2xl bg-primary p-3" dir="rtl">
 			<div className="flex min-h-0 flex-1 flex-col">
 				<TableHeader
 					allRowsSelected={allRowsSelected}

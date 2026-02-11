@@ -50,7 +50,7 @@ export const TableRow = ({
 										title="نمایش"
 										type="button"
 									>
-										<Eye className="h-5 w-5 transition-transform duration-200 group-hover/icon:scale-110" />
+										<Eye className="h-5 w-5 fill-secondary text-transparent transition-transform duration-200 group-hover/icon:scale-110" />
 									</button>
 									<button
 										className="group/icon flex items-center justify-center p-0.5 text-primary transition-all duration-200 hover:scale-125 hover:text-primary/80"
@@ -58,7 +58,7 @@ export const TableRow = ({
 										title="ویرایش"
 										type="button"
 									>
-										<Edit className="h-5 w-5 transition-transform duration-200 group-hover/icon:scale-110" />
+										<Edit className="h-5 w-5 fill-primary text-transparent transition-transform duration-200 group-hover/icon:scale-110" />
 									</button>
 								</div>
 							</div>
