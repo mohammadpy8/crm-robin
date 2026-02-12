@@ -8,17 +8,17 @@ import { useUsersFormHandlers } from "./handlers";
 
 export default function UsersFormContainer() {
 	const { roles } = useRoleStore();
-	const { isOpen, initialValues, handleSubmit, handleClose } = useUsersFormHandlers();
+	const { state, handlers } = useUsersFormHandlers();
 
 	const config = getUsersFormConfig(roles);
 
 	return (
 		<FormBuilder<UserFormData>
 			config={config}
-			initialValues={initialValues}
-			isOpen={isOpen}
-			onClose={handleClose}
-			onSubmit={handleSubmit}
+			initialValues={state.initialValues}
+			isOpen={state.isOpen}
+			onClose={handlers.onClose}
+			onSubmit={handlers.onSubmit}
 		/>
 	);
 }

@@ -1,42 +1,87 @@
 // features/dashboard/users/form/handlers.ts
-import { useCallback, useState } from "react";
+
+import { useCallback, useEffect } from "react";
 import type { UserFormData } from "@/features/dashboard/users/types";
+import { useLayoutStore } from "@/store/useLayoutStore";
+import { useUsersStore } from "../store";
 
 export const useUsersFormHandlers = () => {
-	const [isOpen, setIsOpen] = useState(false);
-	const [initialValues, setInitialValues] = useState<UserFormData | undefined>(undefined);
+	// Get state from store
+	const isOpen = useUsersStore((state) => state.isFormOpen);
+	const formMode = useUsersStore((state) => state.formMode);
+	const formInitialValues = useUsersStore((state) => state.formInitialValues);
+	const { isSidebarOpen, closeSidebar } = useLayoutStore();
 
-	const openCreate = useCallback(() => {
-		console.log("🟢 open create form");
-		setIsOpen(true);
-		setInitialValues(undefined);
-	}, []);
+	useEffect(() => {
+		if (isOpen && isSidebarOpen) {
+			closeSidebar();
+		}
+	}, [isOpen, isSidebarOpen, closeSidebar]);
 
-	const openEdit = useCallback((data: UserFormData) => {
-		console.log("🟡 open edit form", data);
-		setIsOpen(true);
-		setInitialValues(data);
-	}, []);
+	// Get actions from store
+	const closeForm = useUsersStore((state) => state.closeForm);
+	const setTableData = useUsersStore((state) => state.setTableData);
+	const tableData = useUsersStore((state) => state.tableData);
 
-	const handleSubmit = useCallback((data: UserFormData) => {
-		console.log("📨 submit form", data);
-		console.log("✅ pretend user saved");
-		setIsOpen(false);
-		setInitialValues(undefined);
-	}, []);
+	// Handlers
+	const handleSubmit = useCallback(
+		async (data: UserFormData): Promise<void> => {
+			console.log("📨 Submit Form:", { data, formMode });
 
-	const handleClose = useCallback(() => {
-		console.log("❌ form closed by user");
-		setIsOpen(false);
-		setInitialValues(undefined);
-	}, []);
+			try {
+				if (formMode === "create") {
+					console.log("✅ Creating user:", data);
+					await new Promise((resolve) => setTimeout(resolve, 500));
+
+					const newUser = {
+						createdAt: new Date().toLocaleDateString("fa-IR"),
+						email: data.email || "",
+						fullName: data.fullName || "",
+						id: Date.now(),
+						role: data.role || "",
+					};
+
+					setTableData([newUser, ...tableData]);
+				} else if (formMode === "edit") {
+					console.log("✅ Updating user:", data);
+					await new Promise((resolve) => setTimeout(resolve, 500));
+
+					const updatedData = tableData.map((user) =>
+						user.id.toString() === data.id
+							? {
+									...user,
+									email: data.email || user.email,
+									fullName: data.fullName || user.fullName,
+									role: data.role || user.role,
+								}
+							: user,
+					);
+
+					setTableData(updatedData);
+				}
+
+				closeForm();
+			} catch (error) {
+				console.error("❌ Error submitting form:", error);
+			}
+		},
+		[formMode, tableData, setTableData, closeForm],
+	);
+
+	const handleClose = useCallback((): void => {
+		console.log("❌ Form closed");
+		closeForm();
+	}, [closeForm]);
 
 	return {
-		handleClose,
-		handleSubmit,
-		initialValues,
-		isOpen,
-		openCreate,
-		openEdit,
+		handlers: {
+			onClose: handleClose,
+			onSubmit: handleSubmit,
+		},
+		state: {
+			initialValues: formInitialValues as UserFormData | undefined,
+			isOpen,
+			mode: formMode,
+		},
 	};
 };

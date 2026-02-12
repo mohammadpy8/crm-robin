@@ -1,18 +1,15 @@
 "use client";
 
-import { Toolbar, useToolbarContext } from "@/features/shared/ui/toolbar";
+import { Toolbar } from "@/features/shared/ui/toolbar";
 import usersToolbarConfig from "./config";
-import toolbarHandlers from "./handlers";
+import { useToolbarHandlers } from "./handlers";
 
 export default function UsersToolbarContainer() {
-	const { selectedCount, selectedFilter } = useToolbarContext();
-
-	console.log("Selected Filter is:", selectedFilter.value);
-	console.log("Selected Count:", selectedCount);
+	const { handlers } = useToolbarHandlers();
 
 	return (
 		<div className="w-full">
-			<Toolbar config={usersToolbarConfig} handlers={toolbarHandlers} />
+			<Toolbar config={usersToolbarConfig} handlers={handlers} />
 		</div>
 	);
 }

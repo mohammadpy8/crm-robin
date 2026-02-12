@@ -1,163 +1,89 @@
-// features/dashboard/users/store/useUsersStore.ts
-
 import { create } from "zustand";
-import { authService } from "@/api/services/auth.service";
-import type { UserListItem } from "@/api/types";
-import type { UserFormData } from "../types";
+import type { FilterValue } from "@/features/shared/ui/table";
+import type { FormMode, UserData, UsersState } from "../types/";
 
-interface UsersStore {
-	users: UserListItem[];
-	isLoading: boolean;
-	error: string | null;
+interface UsersStore extends UsersState {
+	// Table Actions
+	setTableData: (data: UserData[]) => void;
+	setTableLoading: (isLoading: boolean) => void;
+	setCurrentPage: (page: number) => void;
 
-	isFormOpen: boolean;
-	formMode: "create" | "edit" | "view";
-	selectedUser: UserFormData | null;
-	selectedUserIds: number[];
-	currentFilter: string;
+	// Filter Actions
+	setFilters: (filters: Record<string, FilterValue>) => void;
+	setSort: (field: string | null, order: "asc" | "desc" | null) => void;
 
-	fetchUsers: () => Promise<void>;
-	createUser: (data: UserFormData) => Promise<void>;
-	updateUser: (id: number, data: UserFormData) => Promise<void>;
-	deleteUser: (id: number) => Promise<void>;
+	// Selection Actions
+	setSelectedIds: (ids: number[]) => void;
 
-	openCreateForm: () => void;
-	openEditForm: (user: UserListItem) => void;
-	openViewForm: (user: UserListItem) => void;
+	// Form Actions
+	openForm: (mode: FormMode, data?: Record<string, string>) => void;
 	closeForm: () => void;
-	setSelectedUserIds: (ids: number[]) => void;
-	clearSelection: () => void;
-	setCurrentFilter: (filter: string) => void;
+
+	// Toolbar Actions
+	setToolbarFilter: (filter: string) => void;
 }
 
-export const useUsersStore = create<UsersStore>((set, get) => ({
-
-	clearSelection: () => {
-		set({ selectedUserIds: [] });
-	},
-
-	closeForm: () => {
-		set({
-			isFormOpen: false,
-			selectedUser: null,
-		});
-	},
-
-	// Create User
-	createUser: async (data: UserFormData) => {
-		set({ error: null, isLoading: true });
-		try {
-			await authService.signup({
-				email: data.email || "",
-				fullName: data.fullName || "",
-				password: data.password || "",
-				phoneNumber: data.mobile || "",
-			});
-			await get().fetchUsers();
-			set({ isFormOpen: false, isLoading: false });
-		} catch (error) {
-			set({ error: "خطا در ایجاد کاربر", isLoading: false });
-			throw error;
-		}
-	},
-	currentFilter: "all",
-
-	// Delete User
-	deleteUser: async (id: number) => {
-		set({ error: null, isLoading: true });
-		try {
-			await authService.deleteUser(id);
-			await get().fetchUsers();
-			get().clearSelection();
-			set({ isLoading: false });
-		} catch (error) {
-			set({ error: "خطا در حذف کاربر", isLoading: false });
-			throw error;
-		}
-	},
-	error: null,
-
-	// Fetch Users
-	fetchUsers: async () => {
-		set({ error: null, isLoading: true });
-		try {
-			const users = await authService.getUserList();
-			set({ isLoading: false, users });
-		} catch  {
-			set({ error: "خطا در دریافت لیست کاربران", isLoading: false });
-		}
-	},
-	formMode: "create",
+const initialState: UsersState = {
+	currentPage: 1,
+	filters: {},
+	formInitialValues: null,
+	formMode: null,
 	isFormOpen: false,
-	isLoading: false,
+	isLoading: true,
+	selectedFilter: "all",
+	selectedIds: [],
+	sortField: null,
+	sortOrder: null,
+	tableData: [],
+	totalItems: 0,
+};
 
-	// Open Create Form
-	openCreateForm: () => {
+export const useUsersStore = create<UsersStore>((set) => ({
+	...initialState,
+
+	closeForm: () =>
 		set({
-			formMode: "create",
-			isFormOpen: true,
-			selectedUser: null,
-		});
-	},
+			formInitialValues: null,
+			formMode: null,
+			isFormOpen: false,
+		}),
 
-	// Open Edit Form
-	openEditForm: (user: UserListItem) => {
+	// Form Actions
+	openForm: (mode, data) =>
 		set({
-			formMode: "edit",
+			formInitialValues: data || null,
+			formMode: mode,
 			isFormOpen: true,
-			selectedUser: {
-				email: "",
-				fullName: user.fullName,
-				id: String(user.id),
-				mobile: "",
-				password: "",
-			},
-		});
-	},
+		}),
 
-	// Open View Form
-	openViewForm: (user: UserListItem) => {
+	setCurrentPage: (page) => set({ currentPage: page }),
+
+	// Filter Actions
+	setFilters: (filters) =>
 		set({
-			formMode: "view",
-			isFormOpen: true,
-			selectedUser: {
-				email: "",
-				fullName: user.fullName,
-				id: String(user.id),
-				mobile: "",
-				password: "",
-			},
-		});
-	},
-	selectedUser: null,
-	selectedUserIds: [],
+			currentPage: 1,
+			filters,
+		}),
 
-	// Set Current Filter
-	setCurrentFilter: (filter: string) => {
-		set({ currentFilter: filter });
-	},
+	// Selection Actions
+	setSelectedIds: (ids) => set({ selectedIds: ids }),
 
-	// Set Selected User IDs
-	setSelectedUserIds: (ids: number[]) => {
-		set({ selectedUserIds: ids });
-	},
+	setSort: (field, order) =>
+		set({
+			sortField: field,
+			sortOrder: order,
+		}),
 
-	// Update User
-	updateUser: async (id: number, data: UserFormData) => {
-		set({ error: null, isLoading: true });
-		try {
-			await authService.updateUser(id, {
-				email: data.email,
-				fullName: data.fullName,
-				phoneNumber: data.mobile,
-			});
-			await get().fetchUsers();
-			set({ isFormOpen: false, isLoading: false });
-		} catch (error) {
-			set({ error: "خطا در ویرایش کاربر", isLoading: false });
-			throw error;
-		}
-	},
-	// Initial State
-	users: [],
+	// Table Actions
+	setTableData: (data) =>
+		set({
+			isLoading: false,
+			tableData: data,
+			totalItems: data.length,
+		}),
+
+	setTableLoading: (isLoading) => set({ isLoading }),
+
+	// Toolbar Actions
+	setToolbarFilter: (filter) => set({ selectedFilter: filter }),
 }));

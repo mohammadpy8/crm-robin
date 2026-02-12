@@ -79,7 +79,7 @@ const usersToolbarConfig = {
 		title: "کاربران",
 	},
 
-	showSelectionCount: false,
+	showSelectionCount: true,
 
 	viewButtons: [
 		{
