@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { ToolbarProvider } from "@/features/shared/ui/toolbar";
 import { useRoleStore } from "@/store/useRoleStore";
 import { UsersFormContainer } from "./form";
@@ -23,7 +23,9 @@ export default function UsersList() {
 			</ToolbarProvider>
 
 			<div>
-				<UsersTableContainer />
+				<Suspense fallback={null}>
+					<UsersTableContainer />
+				</Suspense>
 			</div>
 		</>
 	);

@@ -20,7 +20,7 @@ export default function UsersTableContainer() {
 			data={state.data}
 			itemsPerPage={ITEMS_PER_PAGE}
 			loading={state.isLoading}
-			multiSelect={true}
+			multiSelect={false}
 			onFilterChange={handlers.onFilterChange}
 			onPageChange={handlers.onPageChange}
 			onRowEdit={handlers.onEdit}

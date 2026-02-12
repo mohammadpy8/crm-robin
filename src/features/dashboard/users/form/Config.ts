@@ -13,7 +13,7 @@ export const getUsersFormConfig = (
 					placeholder: "نام کامل",
 					required: true,
 					type: "text" as const,
-					validation: ValidationSchemas.minLength(2, "نام کامل"),
+					validation: ValidationSchemas.minLength(7, "نام کامل"),
 				},
 				{
 					label: "نقش کاربری",
@@ -48,7 +48,7 @@ export const getUsersFormConfig = (
 		{
 			fields: [
 				{
-					fullWidth: true,
+					fullWidth: false,
 					label: "ایمیل",
 					name: "email",
 					placeholder: "پیش فرض",

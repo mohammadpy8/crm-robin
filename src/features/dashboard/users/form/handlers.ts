@@ -1,12 +1,14 @@
-// features/dashboard/users/form/handlers.ts
-
 import { useCallback, useEffect } from "react";
+import toast from "react-hot-toast";
+import { getErrorMessage } from "@/api/core/httpClient";
+import { authService } from "@/api/services";
 import type { UserFormData } from "@/features/dashboard/users/types";
 import { useLayoutStore } from "@/store/useLayoutStore";
 import { useUsersStore } from "../store";
+import { mapUserListToTableRows } from "../utils";
+
 
 export const useUsersFormHandlers = () => {
-	// Get state from store
 	const isOpen = useUsersStore((state) => state.isFormOpen);
 	const formMode = useUsersStore((state) => state.formMode);
 	const formInitialValues = useUsersStore((state) => state.formInitialValues);
@@ -18,58 +20,64 @@ export const useUsersFormHandlers = () => {
 		}
 	}, [isOpen, isSidebarOpen, closeSidebar]);
 
-	// Get actions from store
 	const closeForm = useUsersStore((state) => state.closeForm);
 	const setTableData = useUsersStore((state) => state.setTableData);
-	const tableData = useUsersStore((state) => state.tableData);
+	const setTableLoading = useUsersStore((state) => state.setTableLoading);
 
-	// Handlers
 	const handleSubmit = useCallback(
 		async (data: UserFormData): Promise<void> => {
-			console.log("📨 Submit Form:", { data, formMode });
-
 			try {
 				if (formMode === "create") {
-					console.log("✅ Creating user:", data);
-					await new Promise((resolve) => setTimeout(resolve, 500));
-
-					const newUser = {
-						createdAt: new Date().toLocaleDateString("fa-IR"),
+					const newUserPayload = {
 						email: data.email || "",
 						fullName: data.fullName || "",
-						id: Date.now(),
-						role: data.role || "",
+						password: data.password || "",
+						phoneNumber: data.mobile || "",
 					};
 
-					setTableData([newUser, ...tableData]);
+					await authService.signup(newUserPayload);
+
+					setTableLoading(true);
+					const updatedUserList = await authService.getUserList();
+					const mappedData = mapUserListToTableRows(updatedUserList);
+					setTableData(mappedData);
+					setTableLoading(false);
 				} else if (formMode === "edit") {
-					console.log("✅ Updating user:", data);
-					await new Promise((resolve) => setTimeout(resolve, 500));
+					const updatePayload = {
+						email: data.email,
+						fullName: data.fullName,
+						phoneNumber: data.mobile,
+					};
 
-					const updatedData = tableData.map((user) =>
-						user.id.toString() === data.id
-							? {
-									...user,
-									email: data.email || user.email,
-									fullName: data.fullName || user.fullName,
-									role: data.role || user.role,
-								}
-							: user,
-					);
+					await authService.updateUser(Number(data.id), updatePayload);
 
-					setTableData(updatedData);
+					if (data.role) {
+						await authService.updateRole(Number(data.id), {
+							roleId: Number(data.role),
+						});
+					}
+
+					if (data.password) {
+						await authService.updatePassword(Number(data.id), {
+							password: data.password,
+						});
+					}
+					setTableLoading(true);
+					const updatedUserList = await authService.getUserList();
+					const mappedData = mapUserListToTableRows(updatedUserList);
+					setTableData(mappedData);
+					setTableLoading(false);
 				}
 
 				closeForm();
 			} catch (error) {
-				console.error("❌ Error submitting form:", error);
+				toast(getErrorMessage(error));
 			}
 		},
-		[formMode, tableData, setTableData, closeForm],
+		[formMode, setTableData, closeForm],
 	);
 
 	const handleClose = useCallback((): void => {
-		console.log("❌ Form closed");
 		closeForm();
 	}, [closeForm]);
 

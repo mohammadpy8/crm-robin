@@ -2,12 +2,12 @@ import type { ColumnConfig } from "./column.types";
 import type { FilterValue } from "./filter.types";
 
 export interface TableRow {
-	date: string;
-	email: string;
-	id: number;
-	name: string;
-	phone: string;
-	role: string;
+	date?: string;
+	email?: string;
+	id?: number;
+	name?: string;
+	phone?: string;
+	role?: string;
 	status?: string;
 	[key: string]: string | number | undefined;
 }

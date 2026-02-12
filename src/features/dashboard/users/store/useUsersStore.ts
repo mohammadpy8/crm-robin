@@ -1,25 +1,20 @@
 import { create } from "zustand";
-import type { FilterValue } from "@/features/shared/ui/table";
-import type { FormMode, UserData, UsersState } from "../types/";
+import type { FilterValue, TableRow } from "@/features/shared/ui/table";
+import type { FormMode, UsersState } from "../types/";
 
 interface UsersStore extends UsersState {
-	// Table Actions
-	setTableData: (data: UserData[]) => void;
+	setTableData: (data: TableRow[]) => void;
 	setTableLoading: (isLoading: boolean) => void;
 	setCurrentPage: (page: number) => void;
 
-	// Filter Actions
 	setFilters: (filters: Record<string, FilterValue>) => void;
 	setSort: (field: string | null, order: "asc" | "desc" | null) => void;
 
-	// Selection Actions
 	setSelectedIds: (ids: number[]) => void;
 
-	// Form Actions
 	openForm: (mode: FormMode, data?: Record<string, string>) => void;
 	closeForm: () => void;
 
-	// Toolbar Actions
 	setToolbarFilter: (filter: string) => void;
 }
 
@@ -48,7 +43,6 @@ export const useUsersStore = create<UsersStore>((set) => ({
 			isFormOpen: false,
 		}),
 
-	// Form Actions
 	openForm: (mode, data) =>
 		set({
 			formInitialValues: data || null,
@@ -58,14 +52,12 @@ export const useUsersStore = create<UsersStore>((set) => ({
 
 	setCurrentPage: (page) => set({ currentPage: page }),
 
-	// Filter Actions
 	setFilters: (filters) =>
 		set({
 			currentPage: 1,
 			filters,
 		}),
 
-	// Selection Actions
 	setSelectedIds: (ids) => set({ selectedIds: ids }),
 
 	setSort: (field, order) =>
@@ -74,7 +66,6 @@ export const useUsersStore = create<UsersStore>((set) => ({
 			sortOrder: order,
 		}),
 
-	// Table Actions
 	setTableData: (data) =>
 		set({
 			isLoading: false,
@@ -84,6 +75,5 @@ export const useUsersStore = create<UsersStore>((set) => ({
 
 	setTableLoading: (isLoading) => set({ isLoading }),
 
-	// Toolbar Actions
 	setToolbarFilter: (filter) => set({ selectedFilter: filter }),
 }));
