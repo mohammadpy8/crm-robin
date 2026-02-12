@@ -1,5 +1,6 @@
 /** biome-ignore-all lint/style/useDefaultSwitchClause: <> */
 
+import { useEffect } from "react";
 import { authService } from "@/api/services";
 import {
 	// type CreateButtonOption,
@@ -75,7 +76,10 @@ export const useToolbarHandlers = () => {
 	const selectedIds = useUsersStore((state) => state.selectedIds);
 	const selectedCount = selectedIds.length;
 	const { setSelectedCount } = useToolbarContext();
-	setSelectedCount(selectedCount);
+
+	useEffect(() => {
+		setSelectedCount(selectedCount);
+	}, [setSelectedCount, selectedCount]);
 
 	return {
 		handlers: createToolbarHandlers(),
