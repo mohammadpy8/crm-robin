@@ -67,7 +67,7 @@ export const DateRangeFilter = ({
 		: undefined;
 
 	return (
-		<div className="flex w-full items-center gap-1">
+		<div className="relative flex w-full items-center">
 			<DatePicker
 				calendar={persian}
 				containerClassName="w-full"
@@ -80,7 +80,7 @@ export const DateRangeFilter = ({
 			/>
 			{localValue?.[0] && (
 				<button
-					className="absolute left-1 z-50 shrink-0 rounded p-0.5 transition-colors hover:bg-gray-100"
+					className="-translate-y-1/2 absolute top-1/2 left-1 z-50 shrink-0 rounded bg-white p-0.5 transition-color"
 					onClick={handleClear}
 					type="button"
 				>
