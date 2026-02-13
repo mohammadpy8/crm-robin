@@ -11,7 +11,6 @@ import {
 
 const ContactsPage = () => {
 	const toolbarConfig = {
-		// ==================== Action Buttons ====================
 		actionButtons: [
 			{
 				hasPopover: true,
