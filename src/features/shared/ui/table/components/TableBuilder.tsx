@@ -1,10 +1,10 @@
+// features/shared/ui/table/components/TableBuilder.tsx
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { useCallback, useMemo, useRef } from "react";
 import {
-	useSyncScroll,
 	useTableFilters,
 	useTablePagination,
 	useTableSelection,
@@ -33,7 +33,6 @@ export const TableBuilder = ({
 	currentPage: externalCurrentPage,
 }: TableBuilderProps) => {
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
-	const headerScrollRef = useRef<HTMLDivElement>(null);
 
 	const { sorting, handleSort } = useTableSort(onSortChange);
 	const { setFilter, getFilter, getAllFilters } = useTableFilters();
@@ -51,8 +50,6 @@ export const TableBuilder = ({
 		multiSelect,
 		onSelectionChange,
 	});
-
-	useSyncScroll(headerScrollRef, scrollContainerRef);
 
 	const applyFilters = useCallback((): void => {
 		if (onFilterChange) {
@@ -169,37 +166,84 @@ export const TableBuilder = ({
 	}, [rowSelection, allRowsSelected]);
 
 	return (
-		<div className="mx-10 flex h-[calc(100vh-15rem)] flex-col rounded-2xl bg-primary p-3" dir="rtl">
+		<div
+			className="mx-10 flex h-[calc(100vh-15rem)] flex-col rounded-2xl bg-primary p-3"
+			dir="rtl"
+		>
 			<div className="flex min-h-0 flex-1 flex-col">
-				<TableHeader
-					allRowsSelected={allRowsSelected}
-					columnWidths={columnWidths}
-					headerGroups={table.getHeaderGroups()}
-					headerScrollRef={headerScrollRef}
-					multiSelect={multiSelect}
-					onApplyFilters={applyFilters}
-					onSelectAll={handleSelectAll}
-					someRowsSelected={someRowsSelected}
-				/>
+				<div
+					className="custom-scrollbar flex-1 overflow-auto"
+					ref={scrollContainerRef}
+					style={{
+						scrollbarGutter: "stable",
+					}}
+				>
+					<div className="pr-3">
+						<div style={{ minWidth: "max-content" }}>
+							<TableHeader
+								allRowsSelected={allRowsSelected}
+								columnWidths={columnWidths}
+								headerGroups={table.getHeaderGroups()}
+								multiSelect={multiSelect}
+								onApplyFilters={applyFilters}
+								onSelectAll={handleSelectAll}
+								someRowsSelected={someRowsSelected}
+							/>
 
-				{loading ? (
-					<LoadingState columnWidths={columnWidths} itemsPerPage={itemsPerPage} />
-				) : (
-					<TableBody
-						columnConfigs={columnConfigs}
-						columns={columns}
-						columnWidths={columnWidths}
-						currentPage={currentPage}
-						data={data}
-						itemsPerPage={itemsPerPage}
-						onRowEdit={onRowEdit}
-						onRowSelection={handleRowSelection}
-						onRowView={onRowView}
-						renderCellContent={renderCellContent}
-						rowSelection={rowSelection}
-						scrollContainerRef={scrollContainerRef}
-					/>
-				)}
+							{loading ? (
+								<LoadingState columnWidths={columnWidths} itemsPerPage={itemsPerPage} />
+							) : (
+								<TableBody
+									columnConfigs={columnConfigs}
+									columns={columns}
+									columnWidths={columnWidths}
+									currentPage={currentPage}
+									data={data}
+									itemsPerPage={itemsPerPage}
+									onRowEdit={onRowEdit}
+									onRowSelection={handleRowSelection}
+									onRowView={onRowView}
+									renderCellContent={renderCellContent}
+									rowSelection={rowSelection}
+								/>
+							)}
+						</div>
+					</div>
+
+					<style jsx={true}>{`
+						.custom-scrollbar::-webkit-scrollbar {
+							width: 8px;
+							height: 8px;
+						}
+
+						.custom-scrollbar::-webkit-scrollbar-track {
+							background: transparent;
+							border-radius: 8px;
+						}
+
+						.custom-scrollbar::-webkit-scrollbar-thumb {
+							background: rgba(0, 0, 0, 0.2);
+							border-radius: 8px;
+							border: 2px solid transparent;
+							background-clip: padding-box;
+						}
+
+						.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+							background: rgba(0, 0, 0, 0.3);
+							border: 2px solid transparent;
+							background-clip: padding-box;
+						}
+
+						.custom-scrollbar::-webkit-scrollbar-corner {
+							background: transparent;
+						}
+
+						.custom-scrollbar {
+							scrollbar-width: thin;
+							scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+						}
+					`}</style>
+				</div>
 			</div>
 
 			<TablePagination
@@ -207,17 +251,6 @@ export const TableBuilder = ({
 				onPageChange={handlePageChange}
 				totalPages={totalPages}
 			/>
-
-			<style jsx={true}>{`
-				.scrollbar-hide::-webkit-scrollbar {
-					display: none;
-				}
-
-				.scrollbar-hide {
-					-ms-overflow-style: none;
-					scrollbar-width: none;
-				}
-			`}</style>
 		</div>
 	);
 };
