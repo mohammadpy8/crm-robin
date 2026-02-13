@@ -16,6 +16,7 @@ export default function UsersFormContainer() {
 		<FormBuilder<UserFormData>
 			config={config}
 			initialValues={state.initialValues}
+			isLoading={state.isPending}
 			isOpen={state.isOpen}
 			onClose={handlers.onClose}
 			onSubmit={handlers.onSubmit}

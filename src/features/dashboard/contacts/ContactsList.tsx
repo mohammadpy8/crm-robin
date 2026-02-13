@@ -2,7 +2,8 @@
 
 import { Suspense } from "react";
 import ContactsPage from "@/features/dashboard/contacts/Contact";
-import TableBuilderExample from "@/features/shared/ui/tablebuilder/components/TableBuilder";
+import TableBuilderExample from "../accounts/TableExample";
+
 // import { ContactsFormContainer } from "./form";
 
 export default function ContactsList() {

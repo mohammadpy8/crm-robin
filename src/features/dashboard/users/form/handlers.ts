@@ -1,5 +1,7 @@
 import { useCallback, useEffect } from "react";
+import { getErrorMessage } from "@/api/core/httpClient";
 import type { UserFormData } from "@/features/dashboard/users/types";
+import { showToast } from "@/lib/utils/toast";
 import { useLayoutStore } from "@/store/useLayoutStore";
 import { useCreateUser, useUpdateUser } from "../api";
 import { useUsersStore } from "../store";
@@ -31,6 +33,7 @@ export const useUsersFormHandlers = () => {
 						password: data.password || "",
 						phoneNumber: data.mobile || "",
 					});
+					closeForm();
 				} else if (formMode === "edit") {
 					if (!formInitialValues) {
 						return;
@@ -45,14 +48,13 @@ export const useUsersFormHandlers = () => {
 						password: data.password || undefined,
 						roleId: data.role ? Number(data.role) : undefined,
 					});
+					closeForm();
 				}
-
-				closeForm();
 			} catch (error) {
-				console.error("Form submission error:", error);
+				showToast.error(getErrorMessage(error));
 			}
 		},
-		[formMode, createUser, updateUser, closeForm],
+		[formMode, createUser, updateUser, closeForm, formInitialValues],
 	);
 
 	const handleClose = useCallback((): void => {

@@ -27,4 +27,5 @@ export interface FormBuilderProps<T extends Record<string, unknown>> {
 	config: FormConfig;
 	initialValues?: Partial<T>;
 	fieldData?: FieldDataMap;
+	isLoading?: boolean;
 }
