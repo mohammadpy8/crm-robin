@@ -4,7 +4,7 @@ import type { FilterValue } from "./filter.types";
 export interface TableRow {
 	date?: string;
 	email?: string;
-	id?: number;
+	id: number;
 	name?: string;
 	phone?: string;
 	role?: string;

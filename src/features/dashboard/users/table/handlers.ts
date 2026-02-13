@@ -1,35 +1,19 @@
-import { useCallback, useEffect } from "react";
-import { authService } from "@/api/services";
+import { useCallback } from "react";
 import type { FilterValue, TableRow } from "@/features/shared/ui/table";
+import { useUsersQuery } from "../api";
 import { useUsersStore } from "../store";
-import { mapUserListToTableRows } from "../utils";
 
 export const useTableHandlers = () => {
-	const tableData = useUsersStore((state) => state.tableData);
-	const currentPage = useUsersStore((state) => state.currentPage);
-	const totalItems = useUsersStore((state) => state.totalItems);
-	const isLoading = useUsersStore((state) => state.isLoading);
+	const { data = [], isLoading, isFetching, isError } = useUsersQuery();
 
-	const setTableData = useUsersStore((state) => state.setTableData);
-	const setTableLoading = useUsersStore((state) => state.setTableLoading);
+	const currentPage = useUsersStore((state) => state.currentPage);
+	const totalItems = data.length;
+
 	const setCurrentPage = useUsersStore((state) => state.setCurrentPage);
 	const setFilters = useUsersStore((state) => state.setFilters);
 	const setSort = useUsersStore((state) => state.setSort);
 	const setSelectedIds = useUsersStore((state) => state.setSelectedIds);
 	const openForm = useUsersStore((state) => state.openForm);
-
-	useEffect(() => {
-		if (tableData.length === 0 && isLoading) {
-			const loadData = async () => {
-				setTableLoading(true);
-				const updatedUserList = await authService.getUserList();
-				const mappedData = mapUserListToTableRows(updatedUserList);
-				setTableData(mappedData);
-				setTableLoading(false);
-			};
-			loadData();
-		}
-	}, [tableData.length, isLoading, setTableData, setTableLoading]);
 
 	const handleFilterChange = useCallback(
 		(newFilters: Record<string, FilterValue>): void => {
@@ -84,7 +68,9 @@ export const useTableHandlers = () => {
 		},
 		state: {
 			currentPage,
-			data: tableData,
+			data,
+			isError,
+			isFetching,
 			isLoading,
 			totalItems,
 		},

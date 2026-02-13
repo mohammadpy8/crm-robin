@@ -1,4 +1,4 @@
-import type { FilterValue, TableRow } from "@/features/shared/ui/table";
+import type { FilterValue } from "@/features/shared/ui/table";
 
 export type FormMode = "create" | "edit" | "view";
 
@@ -11,10 +11,7 @@ export interface UserData {
 }
 
 export interface UsersState {
-	tableData: TableRow[];
 	currentPage: number;
-	totalItems: number;
-	isLoading: boolean;
 
 	filters: Record<string, FilterValue>;
 	sortField: string | null;

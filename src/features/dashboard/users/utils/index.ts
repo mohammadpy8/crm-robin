@@ -1,1 +1,0 @@
-export { mapUserListToTableRows } from "./mapUserListToTableRow";

@@ -1,10 +1,8 @@
 import { create } from "zustand";
-import type { FilterValue, TableRow } from "@/features/shared/ui/table";
+import type { FilterValue } from "@/features/shared/ui/table";
 import type { FormMode, UsersState } from "../types/";
 
 interface UsersStore extends UsersState {
-	setTableData: (data: TableRow[]) => void;
-	setTableLoading: (isLoading: boolean) => void;
 	setCurrentPage: (page: number) => void;
 
 	setFilters: (filters: Record<string, FilterValue>) => void;
@@ -24,13 +22,10 @@ const initialState: UsersState = {
 	formInitialValues: null,
 	formMode: null,
 	isFormOpen: false,
-	isLoading: true,
 	selectedFilter: "all",
 	selectedIds: [],
 	sortField: null,
 	sortOrder: null,
-	tableData: [],
-	totalItems: 0,
 };
 
 export const useUsersStore = create<UsersStore>((set) => ({
@@ -65,15 +60,6 @@ export const useUsersStore = create<UsersStore>((set) => ({
 			sortField: field,
 			sortOrder: order,
 		}),
-
-	setTableData: (data) =>
-		set({
-			isLoading: false,
-			tableData: data,
-			totalItems: data.length,
-		}),
-
-	setTableLoading: (isLoading) => set({ isLoading }),
 
 	setToolbarFilter: (filter) => set({ selectedFilter: filter }),
 }));
