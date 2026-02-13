@@ -1,9 +1,3 @@
-// features/dashboard/users/toolbar/Handlers.ts
-/** biome-ignore-all lint/suspicious/useAwait: <explanation> */
-/** biome-ignore-all lint/style/useDefaultSwitchClause: <explanation> */
-/** biome-ignore-all lint/style/useBlockStatements: <explanation> */
-/** biome-ignore-all lint/nursery/noShadow: <explanation> */
-
 import { useCallback, useEffect, useState } from "react";
 import type { ToolbarHandlers } from "@/features/shared/ui/toolbar";
 import { useToolbarContext } from "@/features/shared/ui/toolbar";
@@ -28,10 +22,12 @@ export const useToolbarHandlers = () => {
 	}, [setSelectedCount, selectedCount]);
 
 	const handleDeleteConfirm = useCallback(async () => {
-		const { selectedIds } = useUsersStore.getState();
-		if (selectedIds.length === 0) return;
+		const { selectedIds: currentSelectedIds } = useUsersStore.getState();
+		if (currentSelectedIds.length === 0) {
+			return;
+		}
 
-		await deleteUser.mutateAsync(selectedIds[0]);
+		await deleteUser.mutateAsync(currentSelectedIds[0]);
 		setIsDeleteModalOpen(false);
 	}, [deleteUser]);
 
@@ -41,8 +37,8 @@ export const useToolbarHandlers = () => {
 	}, []);
 
 	const handlers: ToolbarHandlers = {
-		onActionButtonClick: async (buttonId: string): Promise<void> => {
-			const { selectedIds } = useUsersStore.getState();
+		onActionButtonClick: (buttonId: string): void => {
+			const { selectedIds: currentSelectedIds } = useUsersStore.getState();
 
 			switch (buttonId) {
 				case "bulk-update": {
@@ -55,12 +51,17 @@ export const useToolbarHandlers = () => {
 					break;
 				}
 				case "delete": {
-					if (selectedIds.length === 0) return;
+					if (currentSelectedIds.length === 0) {
+						return;
+					}
 
-					const user = users.find((u) => u.id === selectedIds[0]);
+					const user = users.find((u) => u.id === currentSelectedIds[0]);
 					const name = (user as { fullName?: string })?.fullName || "";
 					setUserNameToDelete(name);
 					setIsDeleteModalOpen(true);
+					break;
+				}
+				default: {
 					break;
 				}
 			}
