@@ -1,8 +1,0 @@
-export const userKeys = {
-	all: ["users"] as const,
-	detail: (id: number) => [...userKeys.details(), id] as const,
-	details: () => [...userKeys.all, "detail"] as const,
-	list: (filters?: Record<string, unknown>) =>
-		[...userKeys.lists(), { filters }] as const,
-	lists: () => [...userKeys.all, "list"] as const,
-};

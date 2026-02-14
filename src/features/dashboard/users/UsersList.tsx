@@ -3,30 +3,34 @@
 import { Suspense, useEffect } from "react";
 import { ToolbarProvider } from "@/features/shared/ui/toolbar";
 import { useRoleStore } from "@/store/useRoleStore";
-import { UsersFormContainer } from "./form";
-import { UsersTableContainer } from "./table";
-import UsersToolbarContainer from "./toolbar/Container";
+import { useDebugStore } from "@/hooks/useDebugStore";
+import { useUsersStore } from "./core/store";
+import { UsersForm } from "./components/UsersForm";
+import { UsersTable } from "./components/UsersTable";
+import { UsersToolbar } from "./components/UsersToolbar";
 
 export default function UsersList() {
-	const { fetchRoles } = useRoleStore();
+  const { fetchRoles } = useRoleStore();
 
-	useEffect(() => {
-		fetchRoles();
-	}, [fetchRoles]);
+  useDebugStore("UsersStore", useUsersStore);
 
-	return (
-		<>
-			<UsersFormContainer />
+  useEffect(() => {
+    fetchRoles();
+  }, [fetchRoles]);
 
-			<ToolbarProvider defaultFilter={{ label: "همه کاربران", value: "all" }}>
-				<UsersToolbarContainer />
-			</ToolbarProvider>
+  return (
+    <>
+      <UsersForm />
 
-			<div>
-				<Suspense fallback={null}>
-					<UsersTableContainer />
-				</Suspense>
-			</div>
-		</>
-	);
+      <ToolbarProvider defaultFilter={{ label: "همه کاربران", value: "all" }}>
+        <UsersToolbar />
+      </ToolbarProvider>
+
+      <div>
+        <Suspense fallback={null}>
+          <UsersTable />
+        </Suspense>
+      </div>
+    </>
+  );
 }
