@@ -1,3 +1,25 @@
+"use client";
+
+import { Suspense } from "react";
+import { ToolbarProvider } from "@/features/shared/ui/toolbar";
+import { useAccountsStore } from "./core/store";
+import { useDebugStore } from "@/hooks/useDebugStore";
+import { AccountsForm } from "./components/AccountsForm";
+import { AccountsTable } from "./components/AccountsTable";
+import { AccountsToolbar } from "./components/AccountsToolbar";
+
 export default function AccountList() {
-	return <div>صفحه اکانت ها </div>;
+  useDebugStore("AccountsStore", useAccountsStore);
+
+  return (
+    <>
+      <AccountsForm />
+      <ToolbarProvider defaultFilter={{ label: "همه سازمان‌ها", value: "all" }}>
+        <AccountsToolbar />
+      </ToolbarProvider>
+      <Suspense fallback={null}>
+        <AccountsTable />
+      </Suspense>
+    </>
+  );
 }
