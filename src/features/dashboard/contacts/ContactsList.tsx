@@ -1,31 +1,25 @@
 "use client";
 
 import { Suspense } from "react";
-import ContactsPage from "@/features/dashboard/contacts/Contact";
-import TableBuilderExample from "../accounts/TableExample";
-
-// import { ContactsFormContainer } from "./form";
+import { ToolbarProvider } from "@/features/shared/ui/toolbar";
+import { useContactsStore } from "./core/store";
+import { useDebugStore } from "@/hooks/useDebugStore";
+import { ContactsForm } from "./components/ContactsForm";
+import { ContactsTable } from "./components/ContactsTable";
+import { ContactsToolbar } from "./components/ContactsToolbar";
 
 export default function ContactsList() {
-	// const onSubmitForm = () => {
-	// 	console.log("submit contacts form");
-	// };
+  useDebugStore("ContactsStore", useContactsStore);
 
-	// const onCloseForm = () => {
-	// 	console.log("on close form");
-	// };
-
-	return (
-		<>
-			<ContactsPage />
-			{/* <ContactsFormContainer
-				isOpen={true}
-				onClose={() => onCloseForm()}
-				onSubmit={() => onSubmitForm()}
-			/> */}
-			<Suspense fallback={<div>در حال بارگذاری...</div>}>
-				<TableBuilderExample />
-			</Suspense>
-		</>
-	);
+  return (
+    <>
+      <ContactsForm />
+      <ToolbarProvider defaultFilter={{ label: "همه مخاطبین", value: "all" }}>
+        <ContactsToolbar />
+      </ToolbarProvider>
+      <Suspense fallback={null}>
+        <ContactsTable />
+      </Suspense>
+    </>
+  );
 }

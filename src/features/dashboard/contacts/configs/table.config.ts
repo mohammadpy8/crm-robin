@@ -1,0 +1,88 @@
+import type { ColumnConfig } from "@/features/shared/ui/table";
+
+const positionLabels: Record<string, string> = {
+  owner: "مالک",
+  manager: "مدیر",
+  accountant: "حسابدار",
+  secretary: "منشی",
+  employee: "کارمند",
+  other: "سایر",
+};
+
+export const getContactsColumnConfig = (): ColumnConfig[] => [
+  {
+    accessorKey: "firstName",
+    header: "نام",
+    size: 150,
+    enableSorting: true,
+    enableFiltering: true,
+    filterType: "text",
+    sortableFieldName: "firstName",
+  },
+  {
+    accessorKey: "lastName",
+    header: "نام خانوادگی",
+    size: 150,
+    enableSorting: true,
+    enableFiltering: true,
+    filterType: "text",
+    sortableFieldName: "lastName",
+  },
+  {
+    accessorKey: "phone",
+    header: "تلفن",
+    size: 140,
+    enableSorting: true,
+    enableFiltering: true,
+    filterType: "text",
+    sortableFieldName: "phone",
+  },
+  {
+    accessorKey: "position",
+    header: "موقعیت در سازمان",
+    size: 180,
+    enableSorting: true,
+    enableFiltering: true,
+    filterType: "select-single",
+    sortableFieldName: "position",
+    selectOptions: [
+      { label: "مالک", value: "owner" },
+      { label: "مدیر", value: "manager" },
+      { label: "حسابدار", value: "accountant" },
+      { label: "منشی", value: "secretary" },
+      { label: "کارمند", value: "employee" },
+      { label: "سایر", value: "other" },
+    ],
+  },
+  {
+    accessorKey: "email",
+    header: "ایمیل",
+    size: 200,
+    enableSorting: true,
+    enableFiltering: true,
+    filterType: "text",
+    sortableFieldName: "email",
+  },
+  {
+    accessorKey: "createdAt",
+    header: "تاریخ ایجاد",
+    size: 160,
+    enableSorting: true,
+    enableFiltering: true,
+    filterType: "date-range",
+    sortableFieldName: "createdAt",
+  },
+  {
+    accessorKey: "assignTo",
+    header: "ارجاع به",
+    size: 140,
+    enableSorting: true,
+    enableFiltering: true,
+    filterType: "select-single",
+    sortableFieldName: "assignTo",
+    selectOptions: [
+      { label: "مورد پیش فرض 1", value: "default1" },
+      { label: "مورد پیش فرض 2", value: "default2" },
+    ],
+  },
+];
