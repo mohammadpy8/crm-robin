@@ -9,7 +9,6 @@ import { useUsersStore } from "../core/store";
 import { useCreateUser, useUpdateUser } from "../core/api";
 import { getUsersFormConfig } from "../configs/form.config";
 
-
 const useUsersForm = () => {
   const isOpen = useUsersStore((state) => state.isFormOpen);
   const formMode = useUsersStore((state) => state.formMode);
@@ -68,10 +67,9 @@ const useUsersForm = () => {
     isPending: createUser.isPending || updateUser.isPending,
     onSubmit: handleSubmit,
     onClose: handleClose,
+    formMode, 
   };
 };
-
-
 
 export function UsersForm() {
   const { roles } = useRoleStore();
@@ -81,6 +79,7 @@ export function UsersForm() {
 
   return (
     <FormBuilder<UserFormData>
+      key={`${formState.formMode}-${formState.initialValues?.id || "new"}`} 
       config={config}
       initialValues={formState.initialValues}
       isLoading={formState.isPending}
