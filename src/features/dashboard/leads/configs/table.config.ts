@@ -46,12 +46,12 @@ export const getLeadsColumnConfig = (): ColumnConfig[] => [
 	},
 	{
 		accessorKey: "website",
-		enableFiltering: true,
-		enableSorting: true,
+		enableFiltering: false,
+		enableSorting: false,
 		filterType: "text",
 		header: "وب سایت",
 		size: 150,
-		sortableFieldName: "lastName",
+		sortableFieldName: "website",
 	},
 	{
 		accessorKey: "phone",
@@ -68,7 +68,7 @@ export const getLeadsColumnConfig = (): ColumnConfig[] => [
 		enableSorting: false,
 		filterType: "text",
 		header: "منبع",
-		size: 140,
+		size: 70,
 		sortableFieldName: "source",
 	},
 	{
@@ -94,7 +94,7 @@ export const getLeadsColumnConfig = (): ColumnConfig[] => [
 			{ label: "از دست رفته", value: "lost" },
 			{ label: "موفق", value: "won" },
 		],
-		size: 140,
+		size: 130,
 		sortableFieldName: "status",
 	},
 	{
@@ -103,37 +103,36 @@ export const getLeadsColumnConfig = (): ColumnConfig[] => [
 		enableSorting: true,
 		filterType: "date-range",
 		header: "تاریخ ایجاد",
-		size: 160,
+		size: 140,
 		sortableFieldName: "createdAt",
 	},
-
 	{
-		accessorKey: "assignTo",
+		accessorKey: "assignedToUserId",
 		enableFiltering: true,
 		enableSorting: true,
 		filterType: "select-single",
 		header: "ارجاع به",
 		selectOptions: [
-			{ label: "مورد پیش فرض 1", value: "default1" },
-			{ label: "مورد پیش فرض 2", value: "default2" },
+			{ label: "یوزر 1", value: "1" },
+			{ label: "یوزر 2", value: "9" },
 		],
 		size: 140,
-		sortableFieldName: "assignTo",
+		sortableFieldName: "assignedToUserId",
 	},
 
 	{
 		accessorKey: "company",
-		enableFiltering: false,
-		enableSorting: false,
+		enableFiltering: true,
+		enableSorting: true,
 		filterType: "text",
 		header: "نام مجموعه",
-		size: 180,
+		size: 140,
 		sortableFieldName: "company",
 	},
 	{
 		accessorKey: "priority",
-		enableFiltering: true,
-		enableSorting: true,
+		enableFiltering: false,
+		enableSorting: false,
 		filterType: "select-single",
 		header: "اولویت",
 		selectOptions: [
@@ -145,7 +144,6 @@ export const getLeadsColumnConfig = (): ColumnConfig[] => [
 		size: 120,
 		sortableFieldName: "priority",
 	},
-
 	{
 		accessorKey: "source",
 		enableFiltering: true,
@@ -160,7 +158,7 @@ export const getLeadsColumnConfig = (): ColumnConfig[] => [
 			{ label: "نمایشگاه", value: "exhibition" },
 			{ label: "سایر", value: "etc" },
 		],
-		size: 200,
+		size: 110,
 		sortableFieldName: "LeadSource",
 	},
 ];
