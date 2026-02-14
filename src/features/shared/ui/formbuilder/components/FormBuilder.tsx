@@ -75,11 +75,7 @@ export function FormBuilder<T extends Record<string, unknown>>({
 						))}
 
 						<div className="flex justify-center pt-4">
-							<button 
-								className={submitButtonClasses} 
-								disabled={isLoading} 
-								type="submit"
-							>
+							<button className={submitButtonClasses} disabled={isLoading} type="submit">
 								{isLoading ? (
 									<div className="flex items-center justify-center gap-2">
 										<Spinner color="white" size="sm" />

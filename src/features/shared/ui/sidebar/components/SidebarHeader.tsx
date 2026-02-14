@@ -5,7 +5,6 @@ import type { SidebarHeaderProps } from "@/features/shared/ui/sidebar/types/side
 export function SidebarHeader({ onClose, userProfile }: SidebarHeaderProps) {
 	return (
 		<div className="flex h-22 items-center justify-between bg-secondary px-6">
-			{/* User Info */}
 			<div className="flex items-center gap-3">
 				<div className="h-14 w-14 overflow-hidden rounded-full">
 					<Image
@@ -25,7 +24,6 @@ export function SidebarHeader({ onClose, userProfile }: SidebarHeaderProps) {
 				</div>
 			</div>
 
-			{/* Actions */}
 			<div className="flex">
 				<button
 					aria-label="جستجو"

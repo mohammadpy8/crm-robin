@@ -1,100 +1,97 @@
-// src/features/dashboard/leads/core/api.ts
-import { createApiHooks } from "@/features/shared/factories/createApiHooks";
 import { leadService } from "@/api/services";
 import type { CreateLeadDto, LeadEntity, UpdateLeadDto } from "@/api/types";
-import type { TableRow } from "@/features/shared/ui/table";
 import type { BaseQueryParams } from "@/features/shared/factories/createApiHooks";
+import { createApiHooks } from "@/features/shared/factories/createApiHooks";
+import type { TableRow } from "@/features/shared/ui/table";
 
 export interface UpdateLeadPayload {
-  firstName?: string;
-  lastName?: string;
-  status?: string;
-  source?: string;
-  priority?: string;
-  company?: string;
-  note?: string;
-  address?: string;
-  phone?: string;
-  email?: string;
-  assignedToUserId?: number;
+	firstName?: string;
+	lastName?: string;
+	status?: string;
+	source?: string;
+	priority?: string;
+	company?: string;
+	note?: string;
+	address?: string;
+	phone?: string;
+	email?: string;
+	assignedToUserId?: number;
 }
 
 export const transformLeadsToTableRows = (leads: LeadEntity[]): TableRow[] =>
-  leads.map((lead) => ({
-    id: lead.id,
-    firstName: lead.firstName || "",
-    lastName: lead.lastName || "",
-    phone: lead.phone || "",
-    email: lead.email || "",
-    status: lead.status || "",
-    source: lead.source || "",
-    priority: lead.priority || "",
-    company: lead.company || "",
-    address: lead.address || "",
-    note: lead.note || "",
-    website: "",
-    assignTo: lead.assignedToUserId?.toString() || "",
-    createdAt: lead.createdAt || "",
-  }));
+	leads.map((lead) => ({
+		address: lead.address || "",
+		assignTo: lead.assignedToUserId?.toString() || "",
+		company: lead.company || "",
+		createdAt: lead.createdAt || "",
+		email: lead.email || "",
+		firstName: lead.firstName || "",
+		id: lead.id,
+		lastName: lead.lastName || "",
+		note: lead.note || "",
+		phone: lead.phone || "",
+		priority: lead.priority || "",
+		source: lead.source || "",
+		status: lead.status || "",
+		website: "",
+	}));
 
 const leadsService = {
-  getAll: async (params?: BaseQueryParams): Promise<TableRow[]> => {
-    // اطمینان از اینکه مقادیر معتبر هستند
-    const page = params?.page && params.page >= 1 ? Math.floor(params.page) : 1;
-    const limit = params?.limit && params.limit >= 1 ? Math.floor(params.limit) : 10;
+	create: async (payload: CreateLeadDto): Promise<TableRow> => {
+		const response = await leadService.create(payload);
+		return transformLeadsToTableRows([response])[0];
+	},
 
-    const response = await leadService.getAll({
-      page,
-      limit,
-    });
+	delete: async (id: number): Promise<void> => {
+		await leadService.delete(id);
+	},
+	getAll: async (params?: BaseQueryParams): Promise<TableRow[]> => {
+		const page = params?.page && params.page >= 1 ? Math.floor(params.page) : 1;
+		const limit = params?.limit && params.limit >= 1 ? Math.floor(params.limit) : 10;
 
-    return transformLeadsToTableRows(response.data);
-  },
+		const response = await leadService.getAll({
+			limit,
+			page,
+		});
 
-  create: async (payload: CreateLeadDto): Promise<TableRow> => {
-    const response = await leadService.create(payload);
-    return transformLeadsToTableRows([response])[0];
-  },
+		return transformLeadsToTableRows(response.data);
+	},
 
-  update: async (id: number, payload: UpdateLeadPayload): Promise<TableRow> => {
-    const updateDto: UpdateLeadDto = {
-      firstName: payload.firstName,
-      lastName: payload.lastName,
-      status: payload.status as any,
-      source: payload.source as any,
-      priority: payload.priority,
-      company: payload.company,
-      note: payload.note,
-      address: payload.address,
-      phone: payload.phone,
-      email: payload.email,
-      assignedToUserId: payload.assignedToUserId,
-    };
+	update: async (id: number, payload: UpdateLeadPayload): Promise<TableRow> => {
+		const updateDto: UpdateLeadDto = {
+			address: payload.address,
+			assignedToUserId: payload.assignedToUserId,
+			company: payload.company,
+			email: payload.email,
+			firstName: payload.firstName,
+			lastName: payload.lastName,
+			note: payload.note,
+			phone: payload.phone,
+			priority: payload.priority,
+			source: payload.source as any,
+			status: payload.status as any,
+		};
 
-    const response = await leadService.update(id, updateDto);
-    return transformLeadsToTableRows([response])[0];
-  },
-
-  delete: async (id: number): Promise<void> => {
-    await leadService.delete(id);
-  },
+		const response = await leadService.update(id, updateDto);
+		return transformLeadsToTableRows([response])[0];
+	},
 };
 
 export const {
-  keys: leadKeys,
-  useListQuery: useLeadsQuery,
-  useCreate: useCreateLead,
-  useUpdate: useUpdateLead,
-  useDelete: useDeleteLead,
-  useRefresh: useRefreshLeads,
+	keys: leadKeys,
+	useListQuery: useLeadsQuery,
+	useCreate: useCreateLead,
+	useUpdate: useUpdateLead,
+	useDelete: useDeleteLead,
+	useRefresh: useRefreshLeads,
 } = createApiHooks<TableRow, CreateLeadDto, UpdateLeadPayload>({
-  queryKey: "leads",
-  service: leadsService,
-  messages: {
-    createSuccess: "سرنخ با موفقیت ایجاد شد",
-    updateSuccess: "سرنخ با موفقیت ویرایش شد",
-    deleteSuccess: "سرنخ با موفقیت حذف شد",
-  },
-  retry: 2,
-  staleTime: 1000 * 60 * 2,
+	messages: {
+		createSuccess: "سرنخ با موفقیت ایجاد شد",
+		deleteSuccess: "سرنخ با موفقیت حذف شد",
+		updateSuccess: "سرنخ با موفقیت ویرایش شد",
+	},
+	queryKey: "leads",
+	retry: 2,
+	service: leadsService,
+	staleTime: 1000 * 60 * 2,
 });
