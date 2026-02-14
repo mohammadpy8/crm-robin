@@ -1,0 +1,166 @@
+import type { ColumnConfig } from "@/features/shared/ui/table";
+
+const statusLabels: Record<string, string> = {
+  new: "جدید",
+  contacted: "تماس گرفته شده",
+  qualified: "واجد شرایط",
+  converted: "تبدیل شده",
+  lost: "از دست رفته",
+  won: "موفق",
+};
+
+const sourceLabels: Record<string, string> = {
+  telephone: "تلفن",
+  telegram: "تلگرام",
+  email: "ایمیل",
+  instagram: "اینستاگرام",
+  exhibition: "نمایشگاه",
+  etc: "سایر",
+};
+
+const priorityLabels: Record<string, string> = {
+  low: "کم",
+  medium: "متوسط",
+  high: "بالا",
+  urgent: "فوری",
+};
+
+export const getLeadsColumnConfig = (): ColumnConfig[] => [
+  {
+    accessorKey: "firstName",
+    header: "نام",
+    size: 150,
+    enableSorting: true,
+    enableFiltering: true,
+    filterType: "text",
+    sortableFieldName: "firstName",
+  },
+  {
+    accessorKey: "lastName",
+    header: "نام خانوادگی",
+    size: 150,
+    enableSorting: true,
+    enableFiltering: true,
+    filterType: "text",
+    sortableFieldName: "lastName",
+  },
+  {
+    accessorKey: "website",
+    header: "وب سایت",
+    size: 150,
+    enableSorting: true,
+    enableFiltering: true,
+    filterType: "text",
+    sortableFieldName: "lastName",
+  },
+  {
+    accessorKey: "phone",
+    header: "تلفن",
+    size: 140,
+    enableSorting: true,
+    enableFiltering: true,
+    filterType: "text",
+    sortableFieldName: "phone",
+  },
+  {
+    accessorKey: "source",
+    header: "منبع",
+    size: 140,
+    enableSorting: false,
+    enableFiltering: false,
+    filterType: "text",
+    sortableFieldName: "source",
+  },
+  {
+    accessorKey: "email",
+    header: "ایمیل",
+    size: 200,
+    enableSorting: true,
+    enableFiltering: true,
+    filterType: "text",
+    sortableFieldName: "email",
+  },
+  {
+    accessorKey: "status",
+    header: "وضعیت",
+    size: 140,
+    enableSorting: true,
+    enableFiltering: true,
+    filterType: "select-single",
+    sortableFieldName: "status",
+    selectOptions: [
+      { label: "جدید", value: "new" },
+      { label: "تماس گرفته شده", value: "contacted" },
+      { label: "واجد شرایط", value: "qualified" },
+      { label: "تبدیل شده", value: "converted" },
+      { label: "از دست رفته", value: "lost" },
+      { label: "موفق", value: "won" },
+    ],
+  },
+  {
+    accessorKey: "createdAt",
+    header: "تاریخ ایجاد",
+    size: 160,
+    enableSorting: true,
+    enableFiltering: true,
+    filterType: "date-range",
+    sortableFieldName: "createdAt",
+  },
+
+  {
+    accessorKey: "assignTo",
+    header: "ارجاع به",
+    size: 140,
+    enableSorting: true,
+    enableFiltering: true,
+    filterType: "select-single",
+    sortableFieldName: "assignTo",
+    selectOptions: [
+      { label: "مورد پیش فرض 1", value: "default1" },
+      { label: "مورد پیش فرض 2", value: "default2" },
+    ],
+  },
+
+  {
+    accessorKey: "company",
+    header: "نام مجموعه",
+    size: 180,
+    enableSorting: false,
+    enableFiltering: false,
+    filterType: "text",
+    sortableFieldName: "company",
+  },
+  {
+    accessorKey: "priority",
+    header: "اولویت",
+    size: 120,
+    enableSorting: true,
+    enableFiltering: true,
+    filterType: "select-single",
+    sortableFieldName: "priority",
+    selectOptions: [
+      { label: "کم", value: "low" },
+      { label: "متوسط", value: "medium" },
+      { label: "بالا", value: "high" },
+      { label: "فوری", value: "urgent" },
+    ],
+  },
+
+  {
+    accessorKey: "source",
+    header: "منبع سرنخ",
+    size: 200,
+    enableSorting: true,
+    enableFiltering: true,
+    filterType: "select-single",
+    sortableFieldName: "LeadSource",
+    selectOptions: [
+      { label: "تلفن", value: "telephone" },
+      { label: "تلگرام", value: "telegram" },
+      { label: "ایمیل", value: "email" },
+      { label: "اینستاگرام", value: "instagram" },
+      { label: "نمایشگاه", value: "exhibition" },
+      { label: "سایر", value: "etc" },
+    ],
+  },
+];
