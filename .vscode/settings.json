@@ -3,7 +3,7 @@
 		"editor.defaultFormatter": "biomejs.biome"
 	},
 	"[typescriptreact]": {
-		"editor.defaultFormatter": "biomejs.biome"
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"cSpell.words": ["سرنخ"],
 	"editor.codeActionsOnSave": {
@@ -11,5 +11,8 @@
 		"source.organizeImports.biome": "explicit"
 	},
 	"editor.defaultFormatter": "biomejs.biome",
-	"editor.formatOnSave": true
+	"editor.formatOnSave": true,
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	}
 }
