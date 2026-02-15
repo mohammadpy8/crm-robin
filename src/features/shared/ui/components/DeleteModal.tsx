@@ -79,7 +79,7 @@ export function DeleteModal({
                 انصراف
               </Button>
               <Button
-                className='bg-gradient-to-br from-red-500 to-red-600 font-medium text-white shadow-lg shadow-red-500/30 transition-all hover:scale-[1.02] hover:shadow-red-500/40 hover:shadow-xl'
+                className='bg-linear-to-br from-red-500 to-red-600 font-medium text-white shadow-lg shadow-red-500/30 transition-all hover:scale-[1.02] hover:shadow-red-500/40 hover:shadow-xl'
                 isLoading={isLoading}
                 onPress={() => {
                   onConfirm();
