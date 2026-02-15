@@ -12,7 +12,7 @@ interface CrudStoreState {
 }
 
 interface TableHandlersConfig<T> {
-  useQuery: () => UseQueryResult<T[], Error>; // ✅ تغییر اصلی اینجاست
+  useQuery: () => UseQueryResult<T[], Error>;    
   useStore: <S>(selector: (state: CrudStoreState) => S) => S;
 }
 

@@ -39,6 +39,26 @@ export const getAccountsColumnConfig = (users: UserOption[] = []): ColumnConfig[
   },
   {
     accessorKey: "level",
+    badge: {
+      gold: {
+        bgColor: "#fbbf24",
+        label: "طلایی",
+        textColor: "#ffffff",
+        value: "gold",
+      },
+      silver: {
+        bgColor: "#9ca3af",
+        label: "نقره‌ای",
+        textColor: "#ffffff",
+        value: "silver",
+      },
+      bronze: {
+        bgColor: "#cd7f32",
+        label: "برنزی",
+        textColor: "#ffffff",
+        value: "bronze",
+      },
+    },
     enableFiltering: true,
     enableSorting: false,
     filterType: "select-single",
@@ -48,7 +68,7 @@ export const getAccountsColumnConfig = (users: UserOption[] = []): ColumnConfig[
       { label: "نقره‌ای", value: "silver" },
       { label: "برنزی", value: "bronze" },
     ],
-    size: 70,
+    size: 80,
   },
   {
     accessorKey: "email",
@@ -56,11 +76,31 @@ export const getAccountsColumnConfig = (users: UserOption[] = []): ColumnConfig[
     enableSorting: true,
     filterType: "text",
     header: "ایمیل",
-    size: 160,
+    size: 220,
     sortableFieldName: "email",
   },
   {
     accessorKey: "status",
+    badge: {
+      active: {
+        bgColor: "#10b981",
+        label: "فعال",
+        textColor: "#ffffff",
+        value: "active",
+      },
+      passive: {
+        bgColor: "#ef4444",
+        label: "غیرفعال",
+        textColor: "#ffffff",
+        value: "passive",
+      },
+      suspension: {
+        bgColor: "#f59e0b",
+        label: "تعلیق",
+        textColor: "#ffffff",
+        value: "suspension",
+      },
+    },
     enableFiltering: true,
     enableSorting: false,
     filterType: "select-single",
@@ -70,7 +110,7 @@ export const getAccountsColumnConfig = (users: UserOption[] = []): ColumnConfig[
       { label: "غیرفعال", value: "passive" },
       { label: "تعلیق", value: "suspension" },
     ],
-    size: 70,
+    size: 80,
   },
   {
     accessorKey: "createdAt",

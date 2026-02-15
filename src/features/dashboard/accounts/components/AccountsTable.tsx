@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import type { TableRow } from "@/features/shared/ui/table";
 import { TableBuilder } from "@/features/shared/ui/table";
 import { createTableHandlers } from "@/features/shared/ui/table/hooks/useTableHandlers";
@@ -8,7 +8,6 @@ import { getAccountsColumnConfig } from "../configs/table.config";
 import { useAccountsQuery } from "../core/api";
 import { useAccountsStore } from "../core/store";
 import { useUserStore } from "@/store/useUserStore.";
-
 
 const ITEMS_PER_PAGE = 10;
 
@@ -25,13 +24,26 @@ export function AccountsTable() {
     fetchUsers();
   }, [fetchUsers]);
 
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  const data = useMemo(() => {
+    if (!state.data) return [];
+
+    return state.data.map((row) => ({
+      ...row,
+      assignedToUserId: row.assignedToUserId ? users.find((u) => u.value === row.assignedToUserId)?.label || "-" : "-",
+    }));
+  }, [state.data, users]);
+
   const columns = getAccountsColumnConfig(users);
 
   return (
     <TableBuilder
       columns={columns}
       currentPage={state.currentPage}
-      data={state.data}
+      data={data}
       itemsPerPage={ITEMS_PER_PAGE}
       loading={state.isFetching}
       multiSelect={true}

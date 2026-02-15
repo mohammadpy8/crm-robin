@@ -29,6 +29,7 @@ export function AccountsForm() {
           name: data.organName || "",
           nationalId: data.nationalId || "",
           note: data.note,
+          status: data.status,
           phone: data.mobile || "",
           assignedToUserId: Number(data.assignedToUserId),
         });
@@ -43,6 +44,8 @@ export function AccountsForm() {
               nationalId: data.nationalId,
               note: data.note,
               phone: data.mobile,
+              level: data.level,
+              status: data.status,
               assignedToUserId: Number(data.assignedToUserId),
             },
           },
