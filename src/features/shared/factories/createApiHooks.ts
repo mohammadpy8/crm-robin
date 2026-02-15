@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/style/noNonNullAssertion: <> */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { getErrorMessage } from "@/api/core/httpClient";

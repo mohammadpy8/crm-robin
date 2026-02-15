@@ -57,9 +57,6 @@ const processQueue = (error: Error | null, token: string | null = null): void =>
 
 const axiosInstance: AxiosInstance = axios.create({
 	baseURL: API_CONFIG.BASE_URL,
-	headers: {
-		"Content-Type": "application/json",
-	},
 	timeout: API_CONFIG.TIMEOUT,
 	withCredentials: true,
 });
@@ -70,6 +67,11 @@ axiosInstance.interceptors.request.use(
 		if (token) {
 			config.headers.Authorization = `Bearer ${token}`;
 		}
+
+	if (!(config.data instanceof FormData)) {
+			config.headers["Content-Type"] = "application/json";
+	}
+
 		return config;
 	},
 	(error: AxiosError) => Promise.reject(error),

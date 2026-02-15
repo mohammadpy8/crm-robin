@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/style/noNestedTernary: <> */
 "use client";
 
 import { Checkbox } from "@heroui/react";

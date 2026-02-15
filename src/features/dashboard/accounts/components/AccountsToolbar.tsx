@@ -1,137 +1,171 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Toolbar, useToolbarContext } from "@/features/shared/ui/toolbar";
-import type { ToolbarHandlers } from "@/features/shared/ui/toolbar";
-import { getAccountsToolbarConfig } from "../configs/toolbar.config";
-
-import { useAccountsQuery, useDeleteAccount, useRefreshAccounts } from "../core/api";
-import { useAccountsStore } from "../core/store";
-
+import { getErrorMessage } from "@/api/core/httpClient";
+import { companyService } from "@/api/services";
+import type { CompanyLevel, CompanyStatus } from "@/api/types";
 import { DeleteModal } from "@/features/shared/ui/components/DeleteModal";
 import { FileUploadModal } from "@/features/shared/ui/components/FileUploadModal";
-import { companyService } from "@/api/services";
+import type { ToolbarHandlers } from "@/features/shared/ui/toolbar";
+import { Toolbar, useToolbarContext } from "@/features/shared/ui/toolbar";
+import { showToast } from "@/lib/utils/toast";
 import { useUserStore } from "@/store/useUserStore.";
-import { getErrorMessage } from "@/api/core/httpClient";
+import { getAccountsToolbarConfig } from "../configs/toolbar.config";
+import { useAccountsQuery, useRefreshAccounts } from "../core/api";
+import { useAccountsStore } from "../core/store";
 
 export function AccountsToolbar() {
-  const { setSelectedCount } = useToolbarContext();
+	const { setSelectedCount } = useToolbarContext();
 
-  const { selectedIds, setSelectedIds, openForm, setToolbarFilter } = useAccountsStore();
+	const { selectedIds, setSelectedIds, openForm, setToolbarFilter } = useAccountsStore();
 
-  const { users } = useUserStore();
-  const { data = [] } = useAccountsQuery();
+	const { users } = useUserStore();
+	const { data = [] } = useAccountsQuery();
 
-  const deleteAccount = useDeleteAccount();
-  const refreshAccounts = useRefreshAccounts();
+	const refreshAccounts = useRefreshAccounts();
 
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [uploadModalOpen, setUploadModalOpen] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [entityName, setEntityName] = useState("");
+	const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+	const [uploadModalOpen, setUploadModalOpen] = useState(false);
+	const [isUploading, setIsUploading] = useState(false);
+	const [isDeleting, setIsDeleting] = useState(false);
+	const [entityName, setEntityName] = useState("");
 
-  useEffect(() => {
-    setSelectedCount(selectedIds.length);
-  }, [selectedIds, setSelectedCount]);
+	useEffect(() => {
+		setSelectedCount(selectedIds.length);
+	}, [selectedIds, setSelectedCount]);
 
-  const handleFileUpload = async (file: File) => {
-    setIsUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("assignedToUserId", "1");
-      console.log("File name:", file.name);
-      console.log("File type:", file.type);
-      console.log("File size:", file.size);
+	const handleFileUpload = async (file: File) => {
+		setIsUploading(true);
+		try {
+			const result = await companyService.importExcel(file, 1);
+			showToast.success(`${result.imported} سازمان با موفقیت وارد شد`);
+			if (result.failed && result.failed > 0) {
+				showToast.info(`${result.failed} سازمان با خطا مواجه شد`);
+			}
+			setUploadModalOpen(false);
+			refreshAccounts();
+		} catch (error) {
+			showToast.error(getErrorMessage(error));
+		} finally {
+			setIsUploading(false);
+		}
+	};
 
-      const response = await companyService.importExcel(formData as any);
-      console.log("Success:", response);
-      setUploadModalOpen(false);
-      refreshAccounts();
-    } catch (error) {
-      console.error("Status:", error);
-      console.error("خطا در آپلود فایل اکسل:", error);
-      console.log(getErrorMessage(error));
-    } finally {
-      setIsUploading(false);
-    }
-  };
+	const handlers: ToolbarHandlers = {
+		onActionButtonClick: (id) => {
+			if (id === "delete") {
+				if (selectedIds.length === 1) {
+					const item = data.find((d) => d.id === selectedIds[0]);
+					setEntityName(item?.name ?? "");
+				} else {
+					setEntityName(`${selectedIds.length} سازمان`);
+				}
+				setDeleteModalOpen(true);
+			}
 
-  const handlers: ToolbarHandlers = {
-    onActionButtonClick: (id) => {
-      if (id === "delete") {
-        const item = data.find((d) => d.id === selectedIds[0]);
-        setEntityName(item?.name ?? "");
-        setDeleteModalOpen(true);
-      }
+			if (id === "refresh") {
+        useAccountsStore.getState().resetSelection();
+				refreshAccounts();
+			}
+		},
 
-      if (id === "refresh") {
-        refreshAccounts();
-      }
-    },
+		onActionButtonPopoverConfirm: async (buttonId, selectedValues) => {
+			try {
+				if (buttonId === "change-level") {
+					const level = selectedValues[0] as CompanyLevel;
+					await companyService.bulkChangeLevel({
+						companyIds: selectedIds,
+						level: level,
+					});
+					showToast.success("سطح سازمان‌ها با موفقیت تغییر کرد");
+					setSelectedIds([]);
+					refreshAccounts();
+				}
 
-    onActionButtonPopoverConfirm: (buttonId, selectedValues) => {
-      if (buttonId === "change-level") {
-        const level = selectedValues[0];
-        console.log("Change level to:", level, selectedIds);
-        // API CALL
-      }
+				if (buttonId === "change-status") {
+					const status = selectedValues[0] as CompanyStatus;
+					await companyService.bulkChangeStatus({
+						companyIds: selectedIds,
+						status: status,
+					});
+					showToast.success("وضعیت سازمان‌ها با موفقیت تغییر کرد");
+					setSelectedIds([]);
+					refreshAccounts();
+				}
 
-      if (buttonId === "change-status") {
-        const status = selectedValues[0];
-        console.log("Change status to:", status, selectedIds);
-        // API CALL
-      }
+				if (buttonId === "assign") {
+					const userId = Number(selectedValues[0]);
+					await companyService.bulkAssign({
+						assignedToUserId: userId,
+						companyIds: selectedIds,
+					});
+					showToast.success("سازمان‌ها با موفقیت تخصیص داده شدند");
+					setSelectedIds([]);
+          
+					refreshAccounts();
+				}
+			} catch (error) {
+				showToast.error(getErrorMessage(error));
+			}
+		},
 
-      if (buttonId === "assign") {
-        const userId = selectedValues[0];
-        console.log("Assign to user:", userId, selectedIds);
-        // API CALL
-      }
-    },
+		onCreateClick: () => openForm("create"),
 
-    onCreateClick: () => openForm("create"),
+		onCreateDropdownClick: (option) => {
+			if (option.value === "import-excel") {
+				setUploadModalOpen(true);
+			}
+		},
 
-    onCreateDropdownClick: (option) => {
-      if (option.value === "import-excel") {
-        setUploadModalOpen(true);
-      }
-    },
+		onFilterChange: (value) => {
+			setToolbarFilter(value);
+		},
+	};
 
-    onFilterChange: (value) => {
-      setToolbarFilter(value);
-    },
-  };
+	const handleDelete = useCallback(async () => {
+		setIsDeleting(true);
+		try {
+			await companyService.bulkDelete({
+				companyIds: selectedIds,
+			});
+			showToast.success(
+				selectedIds.length === 1
+					? "سازمان با موفقیت حذف شد"
+					: `${selectedIds.length} سازمان با موفقیت حذف شدند`,
+			);
+			setSelectedIds([]);
+			setDeleteModalOpen(false);
+			refreshAccounts();
+		} catch (error) {
+			showToast.error(getErrorMessage(error));
+		} finally {
+			setIsDeleting(false);
+		}
+	}, [selectedIds, setSelectedIds, refreshAccounts]);
 
-  const handleDelete = useCallback(async () => {
-    await deleteAccount.mutateAsync(selectedIds[0]);
-    setSelectedIds([]);
-    setDeleteModalOpen(false);
-  }, [deleteAccount, selectedIds, setSelectedIds]);
+	return (
+		<>
+			<Toolbar config={getAccountsToolbarConfig(users)} handlers={handlers} />
 
-  return (
-    <>
-      <Toolbar config={getAccountsToolbarConfig(users)} handlers={handlers} />
+			<DeleteModal
+				entityName={entityName}
+				entityType="سازمان"
+				isLoading={isDeleting}
+				isOpen={deleteModalOpen}
+				onClose={() => setDeleteModalOpen(false)}
+				onConfirm={handleDelete}
+			/>
 
-      <DeleteModal
-        entityType='سازمان'
-        entityName={entityName}
-        isOpen={deleteModalOpen}
-        isLoading={deleteAccount.isPending}
-        onClose={() => setDeleteModalOpen(false)}
-        onConfirm={handleDelete}
-      />
-
-      <FileUploadModal
-        isOpen={uploadModalOpen}
-        onClose={() => setUploadModalOpen(false)}
-        onSubmit={handleFileUpload}
-        isLoading={isUploading}
-        title='آپلود فایل اکسل سازمان‌ها'
-        description='فایل اکسل حاوی اطلاعات سازمان‌ها را انتخاب کنید'
-        acceptedFormats={[".xlsx", ".xls"]}
-        maxSizeMB={10}
-      />
-    </>
-  );
+			<FileUploadModal
+				acceptedFormats={[".xlsx", ".xls"]}
+				description="فایل اکسل حاوی اطلاعات سازمان‌ها را انتخاب کنید"
+				isLoading={isUploading}
+				isOpen={uploadModalOpen}
+				maxSizeMB={10}
+				onClose={() => setUploadModalOpen(false)}
+				onSubmit={handleFileUpload}
+				title="آپلود فایل اکسل سازمان‌ها"
+			/>
+		</>
+	);
 }

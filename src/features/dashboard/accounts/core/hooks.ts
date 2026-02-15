@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { accountsService } from "./api";
 
-export const useAccountById = (id: number | null) => {
-  return useQuery({
-    queryKey: ["accounts", "detail", id],
-    queryFn: () => accountsService.getById(id!),
-    enabled: !!id,
-    staleTime: 0,
-  });
+export const useAccountById = (id?: number) => {
+	return useQuery({
+		enabled: !!id,
+		queryFn: () => accountsService.getById(id!),
+		queryKey: ["accounts", "detail", id],
+		staleTime: 0,
+	});
 };

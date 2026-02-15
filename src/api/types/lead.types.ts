@@ -90,8 +90,8 @@ export interface LeadEntity {
 	assignedToUserId?: number;
 	convertedToCompanyId?: number;
 	convertedToContactId?: number;
-	createdAt: string; // ISO 8601 date string
-	updatedAt: string; // ISO 8601 date string
+	createdAt: string;
+	updatedAt: string;
 }
 
 export interface LeadQueryParams {

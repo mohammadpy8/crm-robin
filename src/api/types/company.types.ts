@@ -102,12 +102,9 @@ export interface CompanyQueryParams {
 
 export interface PaginatedCompaniesResponse {
 	data: CompanyEntity[];
-	meta: {
-		total: number;
-		page: number;
-		limit: number;
-		totalPages: number;
-	};
+	total: number;
+	page: number;
+	limit: number;
 }
 
 export interface ImportCompaniesResponse {

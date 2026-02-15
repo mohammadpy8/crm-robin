@@ -2,6 +2,7 @@
 
 import { Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
 import { ChevronDown } from "lucide-react";
+import { useState } from "react";
 import type { CreateButtonOption } from "@/features/shared/ui/toolbar/types/toolbar.types";
 import { cn } from "@/lib/utils";
 
@@ -21,7 +22,13 @@ export const CreateButton: React.FC<CreateButtonProps> = ({
 	onCreateClick,
 	onCreateDropdownClick,
 }) => {
+	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 	const hasDropdown = config.dropdownOptions && config.dropdownOptions.length > 0;
+
+	const handleOptionClick = (option: CreateButtonOption) => {
+		onCreateDropdownClick?.(option);
+		setIsPopoverOpen(false); 
+	};
 
 	if (!hasDropdown) {
 		return (
@@ -70,7 +77,13 @@ export const CreateButton: React.FC<CreateButtonProps> = ({
 				<span>{config.label}</span>
 			</button>
 
-			<Popover offset={10} placement="bottom" showArrow={true}>
+			<Popover
+				isOpen={isPopoverOpen}
+				offset={10}
+				onOpenChange={setIsPopoverOpen}
+				placement="bottom"
+				showArrow={true}
+			>
 				<PopoverTrigger>
 					<button
 						className={cn(
@@ -93,7 +106,7 @@ export const CreateButton: React.FC<CreateButtonProps> = ({
 							<button
 								className="w-full px-4 py-2 text-right text-gray-700 text-sm transition-colors hover:bg-gray-100"
 								key={`${option.value}-${index}`}
-								onClick={() => onCreateDropdownClick?.(option)}
+								onClick={() => handleOptionClick(option)}
 								type="button"
 							>
 								{option.label}

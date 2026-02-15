@@ -53,3 +53,13 @@ export interface User extends UserListItem {
   updatedAt: string;
   role: RoleOption | null;
 }
+
+export interface PaginatedUserResponse {
+	data: User[];
+	meta: {
+		total: number;
+		page: number;
+		limit: number;
+		totalPages: number;
+	};
+}

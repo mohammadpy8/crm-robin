@@ -3,80 +3,106 @@ import type { FilterValue } from "@/features/shared/ui/table";
 import type { AccountsState, FormMode } from "./types";
 
 interface AccountsStore extends AccountsState {
-  queryParams: {
-    page: number;
-    limit: number;
-    filters?: Record<string, FilterValue>;
-    sortField?: string | null;
-    sortOrder?: "asc" | "desc" | null;
-  };
-  setCurrentPage: (page: number) => void;
-  setFilters: (filters: Record<string, FilterValue>) => void;
-  setSort: (field: string | null, order: "asc" | "desc" | null) => void;
-  setSelectedIds: (ids: number[]) => void;
-  openForm: (mode: FormMode, data?: Record<string, string>) => void;
-  closeForm: () => void;
-  setToolbarFilter: (filter: string) => void;
+	queryParams: {
+		page: number;
+		limit: number;
+		filters?: Record<string, FilterValue>;
+		sortField?: string | null;
+		sortOrder?: "asc" | "desc" | null;
+	};
+	totalItems: number;
+	setTotalItems: (total: number) => void;
+	setCurrentPage: (page: number) => void;
+	setFilters: (filters: Record<string, FilterValue>) => void;
+	setSort: (field: string | null, order: "asc" | "desc" | null) => void;
+	setSelectedIds: (ids: number[]) => void;
+	openForm: (mode: FormMode, data?: Record<string, string>) => void;
+	closeForm: () => void;
+	setToolbarFilter: (filter: string) => void;
+	resetSelection: () => void;
+	resetAll: () => void;
 }
 
 const ITEMS_PER_PAGE = 10;
 
 const initialState: AccountsState = {
-  currentPage: 1,
-  filters: {},
-  formInitialValues: null,
-  formMode: null,
-  isFormOpen: false,
-  selectedFilter: "all",
-  selectedIds: [],
-  sortField: null,
-  sortOrder: null,
+	currentPage: 1,
+	filters: {},
+	formInitialValues: null,
+	formMode: null,
+	isFormOpen: false,
+	selectedFilter: "all",
+	selectedIds: [],
+	sortField: null,
+	sortOrder: null,
 };
 
 export const useAccountsStore = create<AccountsStore>((set) => ({
-  ...initialState,
+	...initialState,
 
-  queryParams: {
-    page: 1,
-    limit: ITEMS_PER_PAGE,
-  },
+	closeForm: () => set({ formInitialValues: null, formMode: null, isFormOpen: false }),
 
-  closeForm: () => set({ formInitialValues: null, formMode: null, isFormOpen: false }),
+	openForm: (mode, data) =>
+		set({ formInitialValues: data || null, formMode: mode, isFormOpen: true }),
 
-  openForm: (mode, data) => set({ formInitialValues: data || null, formMode: mode, isFormOpen: true }),
+	queryParams: {
+		limit: ITEMS_PER_PAGE,
+		page: 1,
+	},
 
-  setCurrentPage: (page) =>
-    set((state) => ({
-      currentPage: page,
-      queryParams: {
-        ...state.queryParams,
-        page,
-      },
-    })),
 
-  setFilters: (filters) =>
-    set((state) => ({
-      currentPage: 1,
-      filters,
-      queryParams: {
-        ...state.queryParams,
-        page: 1,
-        filters: Object.keys(filters).length > 0 ? filters : undefined,
-      },
-    })),
+	resetAll: () =>
+		set({
+			...initialState,
+			queryParams: {
+				limit: ITEMS_PER_PAGE,
+				page: 1,
+			},
+			totalItems: 0,
+		}),
 
-  setSelectedIds: (ids) => set({ selectedIds: ids }),
+	resetSelection: () =>
+		set({
+			formInitialValues: null,
+			formMode: null,
+			isFormOpen: false,
+			selectedIds: [],
+		}),
 
-  setSort: (field, order) =>
-    set((state) => ({
-      sortField: field,
-      sortOrder: order,
-      queryParams: {
-        ...state.queryParams,
-        sortField: field,
-        sortOrder: order,
-      },
-    })),
+	setCurrentPage: (page) =>
+		set((state) => ({
+			currentPage: page,
+			queryParams: {
+				...state.queryParams,
+				page,
+			},
+		})),
 
-  setToolbarFilter: (filter) => set({ selectedFilter: filter }),
+	setFilters: (filters) =>
+		set((state) => ({
+			currentPage: 1,
+			filters,
+			queryParams: {
+				...state.queryParams,
+				filters: Object.keys(filters).length > 0 ? filters : undefined,
+				page: 1,
+			},
+		})),
+
+	setSelectedIds: (ids) => set({ selectedIds: ids }),
+
+	setSort: (field, order) =>
+		set((state) => ({
+			queryParams: {
+				...state.queryParams,
+				sortField: field,
+				sortOrder: order,
+			},
+			sortField: field,
+			sortOrder: order,
+		})),
+
+	setToolbarFilter: (filter) => set({ selectedFilter: filter }),
+	setTotalItems: (total) => set({ totalItems: total }),
+	totalItems: 0,
 }));

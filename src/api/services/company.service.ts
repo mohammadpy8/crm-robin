@@ -1,6 +1,7 @@
 /** biome-ignore-all lint/suspicious/useAwait: <> */
 import { API_CONFIG } from "@/api/core/config";
 import { http } from "@/api/core/httpClient";
+import buildQueryString from "@/lib/utils/queryString";
 import type {
 	AssignCompanyDto,
 	BulkAssignCompanyDto,
@@ -50,9 +51,8 @@ export const companyService = {
 		return http.delete<void>(API_CONFIG.ENDPOINTS.COMPANY.BY_ID(id));
 	},
 	getAll: async (params?: CompanyQueryParams): Promise<PaginatedCompaniesResponse> => {
-		const queryString = params ? `?${new URLSearchParams(params as any).toString()}` : "";
 		return http.get<PaginatedCompaniesResponse>(
-			`${API_CONFIG.ENDPOINTS.COMPANY.BASE}${queryString}`,
+			`${API_CONFIG.ENDPOINTS.COMPANY.BASE}${buildQueryString(params)}`,
 		);
 	},
 	getById: async (id: number): Promise<CompanyEntity> => {
@@ -70,15 +70,9 @@ export const companyService = {
 		if (assignedToUserId) {
 			formData.append("assignedToUserId", assignedToUserId.toString());
 		}
-
 		return http.post<ImportCompaniesResponse>(
 			API_CONFIG.ENDPOINTS.COMPANY.IMPORT,
 			formData,
-			{
-				headers: {
-					"Content-Type": "multipart/form-data",
-				},
-			},
 		);
 	},
 	update: async (id: number, data: UpdateCompanyDto): Promise<CompanyEntity> => {

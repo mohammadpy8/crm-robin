@@ -1,6 +1,7 @@
 /** biome-ignore-all lint/suspicious/useAwait: <> */
 import { API_CONFIG } from "@/api/core/config";
 import { http } from "@/api/core/httpClient";
+import buildQueryString from "@/lib/utils/queryString";
 import type {
 	AssignLeadDto,
 	BulkAssignLeadsDto,
@@ -48,9 +49,8 @@ export const leadService = {
 	},
 
 	getAll: async (params?: LeadQueryParams): Promise<PaginatedLeadsResponse> => {
-		const queryString = params ? `?${new URLSearchParams(params as any).toString()}` : "";
 		return http.get<PaginatedLeadsResponse>(
-			`${API_CONFIG.ENDPOINTS.LEAD.BASE}${queryString}`,
+			`${API_CONFIG.ENDPOINTS.LEAD.BASE}${buildQueryString(params)}`,
 		);
 	},
 
