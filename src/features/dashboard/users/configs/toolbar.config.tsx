@@ -71,6 +71,7 @@ export const usersToolbarConfig = {
 	},
 
 	showSelectionCount: true,
+	
 
 	viewButtons: [
 		{

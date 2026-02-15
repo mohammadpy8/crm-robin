@@ -6,6 +6,7 @@ type RoleOption = {
 };
 
 export const getUsersColumnConfig = (roleOptions: RoleOption[]): ColumnConfig[] => [
+
 	{
 		accessorKey: "fullName",
 		enableFiltering: true,
