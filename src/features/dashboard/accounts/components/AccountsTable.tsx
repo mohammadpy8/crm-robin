@@ -9,7 +9,7 @@ import { useAccountsQuery } from "../core/api";
 import { useAccountsStore } from "../core/store";
 import { useUserStore } from "@/store/useUserStore.";
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 2;
 
 const useAccountsTable = createTableHandlers<TableRow>({
   useQuery: useAccountsQuery,

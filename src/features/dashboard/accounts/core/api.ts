@@ -3,32 +3,13 @@ import type { CompanyEntity, CreateCompanyDto, UpdateCompanyDto } from "@/api/ty
 import type { BaseQueryParams } from "@/features/shared/factories/createApiHooks";
 import { createApiHooks } from "@/features/shared/factories/createApiHooks";
 import type { TableRow } from "@/features/shared/ui/table";
-import { UserOption } from "@/store/useUserStore.";
+import { toJalali } from "@/lib/utils/dateUtils";
 
+const ITEMS_PER_PAGE = 3;
 
 export interface UpdateAccountPayload {
   data: UpdateCompanyDto;
 }
-
-const toJalali = (gregorianDate: string): string => {
-  if (!gregorianDate) return "";
-
-  try {
-    const date = new Date(gregorianDate);
-    const formatter = new Intl.DateTimeFormat("fa-IR", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      calendar: "persian",
-    });
-
-    return formatter.format(date);
-  } catch {
-    return "";
-  }
-};
-
-
 
 export const transformAccountsToTableRows = (items: CompanyEntity[]): TableRow[] =>
   items.map((c) => ({
@@ -55,9 +36,28 @@ const accountsService = {
   },
 
   getAll: async (params?: BaseQueryParams): Promise<TableRow[]> => {
-    const page = Math.max(1, Number(params?.page || 1));
-    const limit = Math.max(1, Number(params?.limit || 10));
-    const res = await companyService.getAll({ ...params, limit, page });
+    const page = Math.max(1, Number(params?.page ?? 1));
+    const limit = ITEMS_PER_PAGE;
+
+    const cleanParams: Record<string, any> = {
+      page,
+      limit,
+    };
+
+    if (params?.filters && Object.keys(params.filters).length > 0) {
+      Object.entries(params.filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== "") {
+          cleanParams[key] = value;
+        }
+      });
+    }
+
+    if (params?.sortField && params?.sortOrder) {
+      cleanParams.sortField = params.sortField;
+      cleanParams.sortOrder = params.sortOrder.toUpperCase();
+    }
+
+    const res = await companyService.getAll(cleanParams);
     return transformAccountsToTableRows(res.data);
   },
 

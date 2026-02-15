@@ -1,10 +1,6 @@
-// src/features/dashboard/accounts/configs/form.config.ts
 import type { FormConfig } from "@/features/shared/ui/formbuilder";
 import { ValidationSchemas } from "@/features/shared/ui/formbuilder";
 import { UserOption } from "@/store/useUserStore.";
-
-
-
 
 export const getAccountsFormConfig = (users: UserOption[] = [], usersLoading: boolean = false): FormConfig => ({
   rows: [
@@ -12,7 +8,7 @@ export const getAccountsFormConfig = (users: UserOption[] = [], usersLoading: bo
       fields: [
         {
           label: "نام سازمان",
-          name: "organName",
+          name: "name",
           placeholder: "نام سازمان",
           required: true,
           type: "text" as const,
@@ -32,7 +28,7 @@ export const getAccountsFormConfig = (users: UserOption[] = [], usersLoading: bo
       fields: [
         {
           label: "موبایل",
-          name: "mobile",
+          name: "phone",
           placeholder: "موبایل",
           required: true,
           type: "tel" as const,
@@ -56,7 +52,7 @@ export const getAccountsFormConfig = (users: UserOption[] = [], usersLoading: bo
       fields: [
         {
           label: "سطح مجموعه",
-          name: "serviceLevel",
+          name: "level",
           options: [
             { label: "طلایی", value: "gold" },
             { label: "نقره‌ای", value: "silver" },
@@ -79,7 +75,7 @@ export const getAccountsFormConfig = (users: UserOption[] = [], usersLoading: bo
       fields: [
         {
           label: "ارجاع به",
-          name: "referredBy",
+          name: "assignedToUserId",
           options: users,
           placeholder: usersLoading ? "در حال بارگذاری..." : users.length === 0 ? "کاربری یافت نشد" : "انتخاب کاربر",
           required: false,

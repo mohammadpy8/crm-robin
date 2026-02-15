@@ -4,6 +4,7 @@ import type { FilterValue, TableRow } from "@/features/shared/ui/table";
 
 interface CrudStoreState {
   currentPage: number;
+  queryParams: any; // ← اضافه شد
   setCurrentPage: (page: number) => void;
   setFilters: (filters: Record<string, FilterValue>) => void;
   setSort: (field: string | null, order: "asc" | "desc" | null) => void;
@@ -12,13 +13,15 @@ interface CrudStoreState {
 }
 
 interface TableHandlersConfig<T> {
-  useQuery: () => UseQueryResult<T[], Error>;    
+  useQuery: (params?: any) => UseQueryResult<T[], Error>; // ← params اضافه شد
   useStore: <S>(selector: (state: CrudStoreState) => S) => S;
 }
 
 export const createTableHandlers = <T extends TableRow = TableRow>(config: TableHandlersConfig<T>) => {
   return () => {
-    const queryResult = config.useQuery();
+    const queryParams = config.useStore((state) => state.queryParams);
+
+    const queryResult = config.useQuery(queryParams);
     const { data = [], isLoading, isFetching, isError } = queryResult;
 
     const currentPage = config.useStore((state) => state.currentPage);

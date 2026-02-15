@@ -18,6 +18,10 @@ export function AccountsForm() {
     fetchUsers();
   }, [fetchUsers]);
 
+  useEffect(() => {
+    console.log(formInitialValues);
+  }, [isFormOpen]);
+
   const accountsFormConfig = getAccountsFormConfig(users, usersLoading);
 
   const handleSubmit = useCallback(
@@ -26,24 +30,26 @@ export function AccountsForm() {
         await createAccount.mutateAsync({
           address: data.address,
           email: data.email,
-          name: data.organName || "",
+          name: data.name || "",
           nationalId: data.nationalId || "",
           note: data.note,
           status: data.status,
-          phone: data.mobile || "",
+          phone: data.phone || "",
           assignedToUserId: Number(data.assignedToUserId),
+          level: data.level,
         });
       } else if (formMode === "edit" && formInitialValues?.id) {
+        console.log("this is data: ", data);
         await updateAccount.mutateAsync({
           id: Number(formInitialValues.id),
           payload: {
             data: {
               address: data.address,
               email: data.email,
-              name: data.organName,
+              name: data.name,
               nationalId: data.nationalId,
               note: data.note,
-              phone: data.mobile,
+              phone: data.phone,
               level: data.level,
               status: data.status,
               assignedToUserId: Number(data.assignedToUserId),

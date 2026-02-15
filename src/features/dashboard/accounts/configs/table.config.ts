@@ -14,7 +14,7 @@ export const getAccountsColumnConfig = (users: UserOption[] = []): ColumnConfig[
   {
     accessorKey: "name",
     enableFiltering: true,
-    enableSorting: true,
+    enableSorting: false,
     filterType: "text",
     header: "نام سازمان",
     size: 160,
