@@ -26,4 +26,5 @@ export interface TableBuilderProps {
   onSortChange?: (sortField: string | null, sortOrder: "asc" | "desc" | null) => void;
   totalItems?: number;
   currentPage?: number;
+  externalSelectedIds?: number[];
 }

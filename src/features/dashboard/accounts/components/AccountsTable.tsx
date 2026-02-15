@@ -19,11 +19,10 @@ const useAccountsTable = createTableHandlers<TableRow>({
 export function AccountsTable() {
 	const { users, fetchUsers } = useUserStore();
 	const { state, handlers } = useAccountsTable();
-  const totalItems = useAccountsStore((store) => store.totalItems);
+	const totalItems = useAccountsStore((store) => store.totalItems);
+	const selectedIds = useAccountsStore((store) => store.selectedIds);
 
-  console.log(' total items', totalItems ,  'is fetch:' , state.isFetching)
-
-
+	console.log(" total items", totalItems, "is fetch:", state.isFetching);
 
 	useEffect(() => {
 		fetchUsers();
@@ -34,7 +33,9 @@ export function AccountsTable() {
 	}, [fetchUsers]);
 
 	const data = useMemo(() => {
-		if (!state.data) {return [];}
+		if (!state.data) {
+			return [];
+		}
 
 		return state.data.map((row) => ({
 			...row,
@@ -51,6 +52,7 @@ export function AccountsTable() {
 			columns={columns}
 			currentPage={state.currentPage}
 			data={data}
+			externalSelectedIds={selectedIds}
 			itemsPerPage={ITEMS_PER_PAGE}
 			loading={state.isFetching}
 			multiSelect={true}
