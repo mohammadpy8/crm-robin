@@ -4,6 +4,7 @@ import { useCallback, useEffect } from "react";
 import { FormBuilder } from "@/features/shared/ui/formbuilder";
 import { getAccountsFormConfig } from "../configs/form.config";
 import { useCreateAccount, useUpdateAccount } from "../core/api";
+import { useAccountById } from "../core/hooks"; 
 import { useAccountsStore } from "../core/store";
 import type { AccountFormData } from "../core/types";
 import { useUserStore } from "@/store/useUserStore.";
@@ -14,15 +15,24 @@ export function AccountsForm() {
   const createAccount = useCreateAccount();
   const updateAccount = useUpdateAccount();
 
+  const editId = formMode === "edit" ? Number(formInitialValues?.id) : null;
+  const { data: accountData, isLoading: isLoadingAccount } = useAccountById(editId);
+
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
 
-  useEffect(() => {
-    console.log(formInitialValues);
-  }, [isFormOpen]);
-
   const accountsFormConfig = getAccountsFormConfig(users, usersLoading);
+
+  const getInitialValues = (): AccountFormData | undefined => {
+    if (formMode === "edit" && accountData) {
+      return accountData;
+    }
+    if (formMode === "create") {
+      return undefined;
+    }
+    return formInitialValues as AccountFormData;
+  };
 
   const handleSubmit = useCallback(
     async (data: AccountFormData) => {
@@ -39,7 +49,6 @@ export function AccountsForm() {
           level: data.level,
         });
       } else if (formMode === "edit" && formInitialValues?.id) {
-        console.log("this is data: ", data);
         await updateAccount.mutateAsync({
           id: Number(formInitialValues.id),
           payload: {
@@ -64,9 +73,12 @@ export function AccountsForm() {
 
   return (
     <FormBuilder<AccountFormData>
+      key={`${formMode}-${editId || "new"}`}
       config={accountsFormConfig}
-      initialValues={formInitialValues as AccountFormData}
-      isLoading={createAccount.isPending || updateAccount.isPending || usersLoading}
+      initialValues={getInitialValues()}
+      isLoading={
+        createAccount.isPending || updateAccount.isPending || usersLoading || (formMode === "edit" && isLoadingAccount)
+      }
       isOpen={isFormOpen}
       onClose={closeForm}
       onSubmit={handleSubmit}

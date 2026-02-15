@@ -25,6 +25,19 @@ export const transformAccountsToTableRows = (items: CompanyEntity[]): TableRow[]
     website: "--",
   }));
 
+export const transformCompanyToFormData = (company: CompanyEntity): any => ({
+  id: company.id,
+  name: company.name,
+  email: company.email,
+  phone: company.phone,
+  nationalId: company.nationalId,
+  note: company.note || "",
+  address: company.address || "",
+  status: company.status,
+  level: company.level,
+  assignedToUserId: company.assignedToUserId,
+});
+
 const accountsService = {
   create: async (payload: CreateCompanyDto): Promise<TableRow> => {
     const res = await companyService.create(payload);
@@ -65,6 +78,11 @@ const accountsService = {
     const res = await companyService.update(id, payload.data);
     return transformAccountsToTableRows([res])[0];
   },
+
+  getById: async (id: number): Promise<any> => {
+    const company = await companyService.getById(id);
+    return transformCompanyToFormData(company);
+  },
 };
 
 export const {
@@ -82,3 +100,5 @@ export const {
   queryKey: "accounts",
   service: accountsService,
 });
+
+export { accountsService };
