@@ -1,25 +1,28 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { ToolbarProvider } from "@/features/shared/ui/toolbar";
-import { useDebugStore } from "@/hooks/useDebugStore";
+import { useUserStore } from "@/store/useUserStore.";
 import { ContactsForm } from "./components/ContactsForm";
 import { ContactsTable } from "./components/ContactsTable";
 import { ContactsToolbar } from "./components/ContactsToolbar";
-import { useContactsStore } from "./core/store";
 
 export default function ContactsList() {
-	useDebugStore("ContactsStore", useContactsStore);
+  const { fetchUsers } = useUserStore();
 
-	return (
-		<>
-			<ContactsForm />
-			<ToolbarProvider defaultFilter={{ label: "همه مخاطبین", value: "all" }}>
-				<ContactsToolbar />
-			</ToolbarProvider>
-			<Suspense fallback={null}>
-				<ContactsTable />
-			</Suspense>
-		</>
-	);
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  return (
+    <>
+      <ContactsForm />
+      <ToolbarProvider defaultFilter={{ label: "همه مخاطبین", value: "all" }}>
+        <ContactsToolbar />
+      </ToolbarProvider>
+      <Suspense fallback={null}>
+        <ContactsTable />
+      </Suspense>
+    </>
+  );
 }

@@ -1,7 +1,5 @@
 import type { FilterValue } from "@/features/shared/ui/table";
-import { positionLabels } from "./../configs/table.config";
 import { ContactPosition } from "@/api/types";
-
 export interface ContactFormData {
   [key: string]: string | undefined;
   id?: string;
