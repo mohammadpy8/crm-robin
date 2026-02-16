@@ -3,74 +3,62 @@ import { API_CONFIG } from "@/api/core/config";
 import { http } from "@/api/core/httpClient";
 import buildQueryString from "@/lib/utils/queryString";
 import type {
-	AssignContactDto,
-	BulkAssignContactsDto,
-	BulkDeleteContactsDto,
-	ContactEntity,
-	ContactListItem,
-	ContactQueryParams,
-	CreateContactDto,
-	ImportContactsResponse,
-	PaginatedContactsResponse,
-	UpdateContactDto,
+  AssignContactDto,
+  BulkAssignContactsDto,
+  BulkDeleteContactsDto,
+  BulkOperationResponse,
+  ContactEntity,
+  ContactQueryParams,
+  CreateContactDto,
+  ImportContactsResponse,
+  PaginatedContactsResponse,
+  UpdateContactDto,
 } from "../types";
 
 export const contactService = {
-	assign: async (id: number, data: AssignContactDto): Promise<ContactEntity> => {
-		return http.patch<ContactEntity>(API_CONFIG.ENDPOINTS.CONTACT.ASSIGN(id), data);
-	},
+  create: async (data: CreateContactDto): Promise<ContactEntity> => {
+    return http.post<ContactEntity>(API_CONFIG.ENDPOINTS.CONTACT.BASE, data);
+  },
 
-	bulkAssign: async (data: BulkAssignContactsDto): Promise<void> => {
-		return http.post<void>(API_CONFIG.ENDPOINTS.CONTACT.BULK_ASSIGN, data);
-	},
+  getAll: async (params?: ContactQueryParams): Promise<PaginatedContactsResponse> => {
+    return http.get<PaginatedContactsResponse>(`${API_CONFIG.ENDPOINTS.CONTACT.BASE}${buildQueryString(params)}`);
+  },
 
-	bulkDelete: async (data: BulkDeleteContactsDto): Promise<void> => {
-		return http.post<void>(API_CONFIG.ENDPOINTS.CONTACT.BULK_DELETE, data);
-	},
-	create: async (data: CreateContactDto): Promise<ContactEntity> => {
-		return http.post<ContactEntity>(API_CONFIG.ENDPOINTS.CONTACT.BASE, data);
-	},
+  getById: async (id: number): Promise<ContactEntity> => {
+    return http.get<ContactEntity>(API_CONFIG.ENDPOINTS.CONTACT.BY_ID(id));
+  },
 
-	delete: async (id: number): Promise<void> => {
-		return http.delete<void>(API_CONFIG.ENDPOINTS.CONTACT.BY_ID(id));
-	},
+  update: async (id: number, data: UpdateContactDto): Promise<ContactEntity> => {
+    return http.patch<ContactEntity>(API_CONFIG.ENDPOINTS.CONTACT.BY_ID(id), data);
+  },
 
-	getAll: async (params?: ContactQueryParams): Promise<PaginatedContactsResponse> => {
-		return http.get<PaginatedContactsResponse>(
-			`${API_CONFIG.ENDPOINTS.CONTACT.BASE}${buildQueryString(params)}`,
-		);
-	},
+  delete: async (id: number): Promise<void> => {
+    return http.delete<void>(API_CONFIG.ENDPOINTS.CONTACT.BY_ID(id));
+  },
 
-	getById: async (id: number): Promise<ContactEntity> => {
-		return http.get<ContactEntity>(API_CONFIG.ENDPOINTS.CONTACT.BY_ID(id));
-	},
+  assign: async (id: number, data: AssignContactDto): Promise<ContactEntity> => {
+    return http.patch<ContactEntity>(API_CONFIG.ENDPOINTS.CONTACT.ASSIGN(id), data);
+  },
 
-	getList: async (): Promise<ContactListItem[]> => {
-		return http.get<ContactListItem[]>(API_CONFIG.ENDPOINTS.CONTACT.LIST);
-	},
+  bulkAssign: async (data: BulkAssignContactsDto): Promise<BulkOperationResponse> => {
+    return http.post<BulkOperationResponse>(API_CONFIG.ENDPOINTS.CONTACT.BULK_ASSIGN, data);
+  },
 
-	importExcel: async (
-		file: File,
-		assignedToUserId?: number,
-	): Promise<ImportContactsResponse> => {
-		const formData = new FormData();
-		formData.append("file", file);
-		if (assignedToUserId) {
-			formData.append("assignedToUserId", assignedToUserId.toString());
-		}
+  bulkDelete: async (data: BulkDeleteContactsDto): Promise<BulkOperationResponse> => {
+    return http.post<BulkOperationResponse>(API_CONFIG.ENDPOINTS.CONTACT.BULK_DELETE, data);
+  },
 
-		return http.post<ImportContactsResponse>(
-			API_CONFIG.ENDPOINTS.CONTACT.IMPORT,
-			formData,
-			{
-				headers: {
-					"Content-Type": "multipart/form-data",
-				},
-			},
-		);
-	},
+  //   getList: async (): Promise<ContactListItem[]> => {
+  //     return http.get<ContactListItem[]>(API_CONFIG.ENDPOINTS.CONTACT.LIST);
+  //   },
 
-	update: async (id: number, data: UpdateContactDto): Promise<ContactEntity> => {
-		return http.patch<ContactEntity>(API_CONFIG.ENDPOINTS.CONTACT.BY_ID(id), data);
-	},
+  importExcel: async (file: File, assignedToUserId?: number): Promise<ImportContactsResponse> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    if (assignedToUserId) {
+      formData.append("assignedToUserId", assignedToUserId.toString());
+    }
+
+    return http.post<ImportContactsResponse>(API_CONFIG.ENDPOINTS.CONTACT.IMPORT, formData);
+  },
 };
