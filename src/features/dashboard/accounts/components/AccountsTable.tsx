@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import type { TableRow } from "@/features/shared/ui/table";
 import { TableBuilder } from "@/features/shared/ui/table";
 import { createTableHandlers } from "@/features/shared/ui/table/hooks/useTableHandlers";

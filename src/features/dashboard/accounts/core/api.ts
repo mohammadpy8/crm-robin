@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 import { companyService } from "@/api/services";
 import type { CreateCompanyDto, UpdateCompanyDto } from "@/api/types";
 import type { BaseQueryParams } from "@/features/shared/factories/createApiHooks";
@@ -7,62 +8,61 @@ import type { AccountTableRow } from "./types";
 import { ITEMS_PER_PAGE, toTableRow } from "./utils";
 
 const accountsService = {
-  getAll: async (params?: BaseQueryParams): Promise<AccountTableRow[]> => {
-    const page = Math.max(1, Number(params?.page ?? 1));
-    const limit = ITEMS_PER_PAGE;
+	create: async (payload: CreateCompanyDto): Promise<AccountTableRow> => {
+		const company = await companyService.create(payload);
+		return toTableRow(company);
+	},
 
-    const cleanParams: Record<string, any> = {
-      page,
-      limit,
-    };
+	delete: async (id: number): Promise<void> => {
+		await companyService.delete(id);
+	},
+	getAll: async (params?: BaseQueryParams): Promise<AccountTableRow[]> => {
+		const page = Math.max(1, Number(params?.page ?? 1));
+		const limit = ITEMS_PER_PAGE;
 
-    if (params?.filters && Object.keys(params.filters).length > 0) {
-      Object.entries(params.filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== "") {
-          cleanParams[key] = value;
-        }
-      });
-    }
+		const cleanParams: Record<string, any> = {
+			limit,
+			page,
+		};
 
-    if (params?.sortField && params?.sortOrder) {
-      cleanParams.sortField = params.sortField;
-      cleanParams.sortOrder = params.sortOrder.toUpperCase();
-    }
+		if (params?.filters && Object.keys(params.filters).length > 0) {
+			Object.entries(params.filters).forEach(([key, value]) => {
+				if (value !== undefined && value !== null && value !== "") {
+					cleanParams[key] = value;
+				}
+			});
+		}
 
-    const response = await companyService.getAll(cleanParams);
+		if (params?.sortField && params?.sortOrder) {
+			cleanParams.sortField = params.sortField;
+			cleanParams.sortOrder = params.sortOrder.toUpperCase();
+		}
 
-    useAccountsStore.getState().setTotalItems(response.total);
+		const response = await companyService.getAll(cleanParams);
 
-    return response.data.map(toTableRow);
-  },
+		useAccountsStore.getState().setTotalItems(response.total);
 
-  create: async (payload: CreateCompanyDto): Promise<AccountTableRow> => {
-    const company = await companyService.create(payload);
-    return toTableRow(company);
-  },
+		return response.data.map(toTableRow);
+	},
 
-  update: async (id: number, payload: UpdateCompanyDto): Promise<AccountTableRow> => {
-    const company = await companyService.update(id, payload);
-    return toTableRow(company);
-  },
-
-  delete: async (id: number): Promise<void> => {
-    await companyService.delete(id);
-  },
+	update: async (id: number, payload: UpdateCompanyDto): Promise<AccountTableRow> => {
+		const company = await companyService.update(id, payload);
+		return toTableRow(company);
+	},
 };
 
 export const {
-  useListQuery: useAccountsQuery,
-  useCreate: useCreateAccount,
-  useUpdate: useUpdateAccount,
-  useDelete: useDeleteAccount,
-  useRefresh: useRefreshAccounts,
+	useListQuery: useAccountsQuery,
+	useCreate: useCreateAccount,
+	useUpdate: useUpdateAccount,
+	useDelete: useDeleteAccount,
+	useRefresh: useRefreshAccounts,
 } = createApiHooks<AccountTableRow, CreateCompanyDto, UpdateCompanyDto>({
-  queryKey: "accounts",
-  service: accountsService,
-  messages: {
-    createSuccess: "سازمان با موفقیت ایجاد شد",
-    updateSuccess: "سازمان با موفقیت ویرایش شد",
-    deleteSuccess: "سازمان با موفقیت حذف شد",
-  },
+	messages: {
+		createSuccess: "سازمان با موفقیت ایجاد شد",
+		deleteSuccess: "سازمان با موفقیت حذف شد",
+		updateSuccess: "سازمان با موفقیت ویرایش شد",
+	},
+	queryKey: "accounts",
+	service: accountsService,
 });

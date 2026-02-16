@@ -37,7 +37,7 @@ const useUsersForm = () => {
 				});
 				closeForm();
 			} else if (formMode === "edit") {
-				if (!formInitialValues) return;
+				if (!formInitialValues) {return;}
 				
 
 				await updateUser.mutateAsync({

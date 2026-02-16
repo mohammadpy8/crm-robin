@@ -4,114 +4,114 @@ import type { AccountsState, FormMode } from "./types";
 import { ITEMS_PER_PAGE } from "./utils";
 
 interface AccountsStore extends AccountsState {
-  queryParams: {
-    page: number;
-    limit: number;
-    filters?: Record<string, FilterValue>;
-    sortField?: string | null;
-    sortOrder?: "asc" | "desc" | null;
-  };
-  totalItems: number;
-  setTotalItems: (total: number) => void;
-  setCurrentPage: (page: number) => void;
-  setFilters: (filters: Record<string, FilterValue>) => void;
-  setSort: (field: string | null, order: "asc" | "desc" | null) => void;
-  setSelectedIds: (ids: number[]) => void;
-  openForm: (mode: FormMode, data?: Record<string, string>) => void;
-  closeForm: () => void;
-  setToolbarFilter: (filter: string) => void;
-  resetSelection: () => void;
-  resetAll: () => void;
+	queryParams: {
+		page: number;
+		limit: number;
+		filters?: Record<string, FilterValue>;
+		sortField?: string | null;
+		sortOrder?: "asc" | "desc" | null;
+	};
+	totalItems: number;
+	setTotalItems: (total: number) => void;
+	setCurrentPage: (page: number) => void;
+	setFilters: (filters: Record<string, FilterValue>) => void;
+	setSort: (field: string | null, order: "asc" | "desc" | null) => void;
+	setSelectedIds: (ids: number[]) => void;
+	openForm: (mode: FormMode, data?: Record<string, string>) => void;
+	closeForm: () => void;
+	setToolbarFilter: (filter: string) => void;
+	resetSelection: () => void;
+	resetAll: () => void;
 }
 
 const initialState: AccountsState = {
-  currentPage: 1,
-  filters: {},
-  formInitialValues: null,
-  formMode: null,
-  isFormOpen: false,
-  selectedFilter: "all",
-  selectedIds: [],
-  sortField: null,
-  sortOrder: null,
+	currentPage: 1,
+	filters: {},
+	formInitialValues: null,
+	formMode: null,
+	isFormOpen: false,
+	selectedFilter: "all",
+	selectedIds: [],
+	sortField: null,
+	sortOrder: null,
 };
 
 export const useAccountsStore = create<AccountsStore>((set) => ({
-  ...initialState,
+	...initialState,
 
-  queryParams: {
-    page: 1,
-    limit: ITEMS_PER_PAGE,
-  },
+	closeForm: () =>
+		set({
+			formInitialValues: null,
+			formMode: null,
+			isFormOpen: false,
+		}),
 
-  totalItems: 0,
+	openForm: (mode, data) =>
+		set({
+			formInitialValues: data || null,
+			formMode: mode,
+			isFormOpen: true,
+		}),
 
-  setTotalItems: (total) => set({ totalItems: total }),
+	queryParams: {
+		limit: ITEMS_PER_PAGE,
+		page: 1,
+	},
 
-  setCurrentPage: (page) =>
-    set((state) => ({
-      currentPage: page,
-      queryParams: {
-        ...state.queryParams,
-        page,
-      },
-    })),
+	resetAll: () =>
+		set({
+			...initialState,
+			queryParams: {
+				limit: ITEMS_PER_PAGE,
+				page: 1,
+			},
+			totalItems: 0,
+		}),
 
-  setFilters: (filters) =>
-    set((state) => ({
-      currentPage: 1,
-      filters,
-      queryParams: {
-        ...state.queryParams,
-        page: 1,
-        filters: Object.keys(filters).length > 0 ? filters : undefined,
-      },
-    })),
+	resetSelection: () =>
+		set({
+			formInitialValues: null,
+			formMode: null,
+			isFormOpen: false,
+			selectedIds: [],
+		}),
 
-  setSort: (field, order) =>
-    set((state) => ({
-      sortField: field,
-      sortOrder: order,
-      queryParams: {
-        ...state.queryParams,
-        sortField: field,
-        sortOrder: order,
-      },
-    })),
+	setCurrentPage: (page) =>
+		set((state) => ({
+			currentPage: page,
+			queryParams: {
+				...state.queryParams,
+				page,
+			},
+		})),
 
-  setSelectedIds: (ids) => set({ selectedIds: ids }),
+	setFilters: (filters) =>
+		set((state) => ({
+			currentPage: 1,
+			filters,
+			queryParams: {
+				...state.queryParams,
+				filters: Object.keys(filters).length > 0 ? filters : undefined,
+				page: 1,
+			},
+		})),
 
-  openForm: (mode, data) =>
-    set({
-      isFormOpen: true,
-      formMode: mode,
-      formInitialValues: data || null,
-    }),
+	setSelectedIds: (ids) => set({ selectedIds: ids }),
 
-  closeForm: () =>
-    set({
-      isFormOpen: false,
-      formMode: null,
-      formInitialValues: null,
-    }),
+	setSort: (field, order) =>
+		set((state) => ({
+			queryParams: {
+				...state.queryParams,
+				sortField: field,
+				sortOrder: order,
+			},
+			sortField: field,
+			sortOrder: order,
+		})),
 
-  setToolbarFilter: (filter) => set({ selectedFilter: filter }),
+	setToolbarFilter: (filter) => set({ selectedFilter: filter }),
 
-  resetSelection: () =>
-    set({
-      selectedIds: [],
-      isFormOpen: false,
-      formMode: null,
-      formInitialValues: null,
-    }),
+	setTotalItems: (total) => set({ totalItems: total }),
 
-  resetAll: () =>
-    set({
-      ...initialState,
-      queryParams: {
-        page: 1,
-        limit: ITEMS_PER_PAGE,
-      },
-      totalItems: 0,
-    }),
+	totalItems: 0,
 }));

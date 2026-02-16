@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/style/noNestedTernary: <> */
 import type { FormConfig } from "@/features/shared/ui/formbuilder";
 import { ValidationSchemas } from "@/features/shared/ui/formbuilder";
 import type { UserOption } from "@/store/useUserStore.";

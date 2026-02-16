@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 import { leadService } from "@/api/services";
 import type { CreateLeadDto, UpdateLeadDto } from "@/api/types";
 import type { BaseQueryParams } from "@/features/shared/factories/createApiHooks";
@@ -7,62 +8,61 @@ import type { LeadTableRow } from "./types";
 import { ITEMS_PER_PAGE, toTableRow } from "./utils";
 
 const leadsService = {
-  getAll: async (params?: BaseQueryParams): Promise<LeadTableRow[]> => {
-    const page = Math.max(1, Number(params?.page ?? 1));
-    const limit = ITEMS_PER_PAGE;
+	create: async (payload: CreateLeadDto): Promise<LeadTableRow> => {
+		const lead = await leadService.create(payload);
+		return toTableRow(lead);
+	},
 
-    const cleanParams: Record<string, any> = {
-      page,
-      limit,
-    };
+	delete: async (id: number): Promise<void> => {
+		await leadService.delete(id);
+	},
+	getAll: async (params?: BaseQueryParams): Promise<LeadTableRow[]> => {
+		const page = Math.max(1, Number(params?.page ?? 1));
+		const limit = ITEMS_PER_PAGE;
 
-    if (params?.filters && Object.keys(params.filters).length > 0) {
-      Object.entries(params.filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== "") {
-          cleanParams[key] = value;
-        }
-      });
-    }
+		const cleanParams: Record<string, any> = {
+			limit,
+			page,
+		};
 
-    if (params?.sortField && params?.sortOrder) {
-      cleanParams.sortField = params.sortField;
-      cleanParams.sortOrder = params.sortOrder.toUpperCase();
-    }
+		if (params?.filters && Object.keys(params.filters).length > 0) {
+			Object.entries(params.filters).forEach(([key, value]) => {
+				if (value !== undefined && value !== null && value !== "") {
+					cleanParams[key] = value;
+				}
+			});
+		}
 
-    const response = await leadService.getAll(cleanParams);
+		if (params?.sortField && params?.sortOrder) {
+			cleanParams.sortField = params.sortField;
+			cleanParams.sortOrder = params.sortOrder.toUpperCase();
+		}
 
-    useLeadsStore.getState().setTotalItems(response.total);
+		const response = await leadService.getAll(cleanParams);
 
-    return response.data.map(toTableRow);
-  },
+		useLeadsStore.getState().setTotalItems(response.total);
 
-  create: async (payload: CreateLeadDto): Promise<LeadTableRow> => {
-    const lead = await leadService.create(payload);
-    return toTableRow(lead);
-  },
+		return response.data.map(toTableRow);
+	},
 
-  update: async (id: number, payload: UpdateLeadDto): Promise<LeadTableRow> => {
-    const lead = await leadService.update(id, payload);
-    return toTableRow(lead);
-  },
-
-  delete: async (id: number): Promise<void> => {
-    await leadService.delete(id);
-  },
+	update: async (id: number, payload: UpdateLeadDto): Promise<LeadTableRow> => {
+		const lead = await leadService.update(id, payload);
+		return toTableRow(lead);
+	},
 };
 
 export const {
-  useListQuery: useLeadsQuery,
-  useCreate: useCreateLead,
-  useUpdate: useUpdateLead,
-  useDelete: useDeleteLead,
-  useRefresh: useRefreshLeads,
+	useListQuery: useLeadsQuery,
+	useCreate: useCreateLead,
+	useUpdate: useUpdateLead,
+	useDelete: useDeleteLead,
+	useRefresh: useRefreshLeads,
 } = createApiHooks<LeadTableRow, CreateLeadDto, UpdateLeadDto>({
-  queryKey: "leads",
-  service: leadsService,
-  messages: {
-    createSuccess: "سرنخ با موفقیت ایجاد شد",
-    updateSuccess: "سرنخ با موفقیت ویرایش شد",
-    deleteSuccess: "سرنخ با موفقیت حذف شد",
-  },
+	messages: {
+		createSuccess: "سرنخ با موفقیت ایجاد شد",
+		deleteSuccess: "سرنخ با موفقیت حذف شد",
+		updateSuccess: "سرنخ با موفقیت ویرایش شد",
+	},
+	queryKey: "leads",
+	service: leadsService,
 });
