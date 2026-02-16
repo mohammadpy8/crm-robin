@@ -1,13 +1,14 @@
 import { Kanban, Menu, Plus } from "lucide-react";
 import type { ToolbarConfig } from "@/features/shared/ui/toolbar";
-import { Apps, Delete, Dollar, Send } from "@/icons";
+import { Delete, Dollar, Layers, Send } from "@/icons";
 import Update from "@/icons/path/Update";
+import type { UserOption } from "@/store/useUserStore.";
 
-export const leadsToolbarConfig: ToolbarConfig = {
+export const getLeadsToolbarConfig = (users: UserOption[]): ToolbarConfig => ({
   actionButtons: [
     {
       hasPopover: true,
-      icon: <Apps className='h-4 w-4' />,
+      icon: <Layers className='h-4 w-4 fill-secondary text-transparent' />,
       id: "change-status",
       label: "تغییر وضعیت",
       popoverOptions: [
@@ -18,19 +19,22 @@ export const leadsToolbarConfig: ToolbarConfig = {
         { label: "موفق", value: "won" },
         { label: "از دست رفته", value: "lost" },
       ],
+      selectionMode: "single",
       variant: "ghost" as const,
       visibility: "any" as const,
     },
     {
+      hasPopover: true,
       icon: <Send className='h-4 w-4 fill-secondary text-transparent' />,
       id: "assign",
       label: "ارجاع به",
+      popoverMaxHeight: 200,
+      popoverOptions: users,
+      selectionMode: "single",
       variant: "ghost" as const,
       visibility: "any" as const,
     },
     {
-      className:
-        "focus:outline-none focus:ring-0 active:scale-95 active:shadow-inner transition-all duration-150 ease-in-out",
       icon: <Update className='h-4 w-4 fill-secondary text-transparent' />,
       id: "bulk-update",
       label: "آپدیت کلی",
@@ -38,8 +42,7 @@ export const leadsToolbarConfig: ToolbarConfig = {
       visibility: "any" as const,
     },
     {
-      className:
-        "!bg-red-600 !text-white hover:!bg-red-700 focus:outline-none focus:ring-0 active:scale-95 active:shadow-inner transition-all duration-150 ease-in-out",
+      className: "!bg-red-600 !text-white hover:!bg-red-700",
       icon: <Delete className='h-4 w-4 fill-white text-transparent' />,
       id: "delete",
       label: "حذف",
@@ -67,21 +70,9 @@ export const leadsToolbarConfig: ToolbarConfig = {
 
   moreButton: {
     label: "بیشتر",
-    // options: [
-    //   {
-    //     label: "خروجی Excel",
-    //     value: "export-excel",
-    //   },
-    //   {
-    //     label: "ایمپورت سرنخ ها",
-    //     value: "import-leads",
-    //   },
-    //   {
-    //     label: "گزارش سرنخ ها",
-    //     value: "leads-report",
-    //   },
-    // ],
+    options: [],
   },
+
   pageTitle: {
     icon: <Dollar className='h-7 w-7 fill-primary text-transparent' />,
     title: "سرنخ های فروش",
@@ -92,7 +83,7 @@ export const leadsToolbarConfig: ToolbarConfig = {
   viewButtons: [
     {
       active: true,
-      href: "/users/list",
+      href: "/leads/list",
       icon: <Menu className='h-4 w-4' />,
       id: "list",
       label: "نمایش لیست",
@@ -100,10 +91,10 @@ export const leadsToolbarConfig: ToolbarConfig = {
     {
       active: false,
       disabled: true,
-      href: "/users/kanban",
+      href: "/leads/kanban",
       icon: <Kanban className='h-4 w-4' />,
       id: "kanban",
       label: "نمایش کاریز",
     },
   ],
-};
+});

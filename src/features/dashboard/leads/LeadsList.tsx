@@ -1,29 +1,28 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { ToolbarProvider } from "@/features/shared/ui/toolbar";
-import { useDebugStore } from "@/hooks/useDebugStore";
+import { useUserStore } from "@/store/useUserStore.";
 import { LeadsForm } from "./components/LeadsForm";
 import { LeadsTable } from "./components/LeadsTable";
 import { LeadsToolbar } from "./components/LeadsToolbar";
-import { useLeadsStore } from "./core/store";
 
 export default function LeadsList() {
-	useDebugStore("LeadsStore", useLeadsStore);
+  const { fetchUsers } = useUserStore();
 
-	return (
-		<>
-			<LeadsForm />
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
-			<ToolbarProvider defaultFilter={{ label: "همه سرنخ ها", value: "all" }}>
-				<LeadsToolbar />
-			</ToolbarProvider>
-
-			<div>
-				<Suspense fallback={null}>
-					<LeadsTable />
-				</Suspense>
-			</div>
-		</>
-	);
+  return (
+    <>
+      <LeadsForm />
+      <ToolbarProvider defaultFilter={{ label: "همه سرنخ ها", value: "all" }}>
+        <LeadsToolbar />
+      </ToolbarProvider>
+      <Suspense fallback={null}>
+        <LeadsTable />
+      </Suspense>
+    </>
+  );
 }

@@ -1,96 +1,54 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { FormBuilder } from "@/features/shared/ui/formbuilder";
-import { useLayoutStore } from "@/store/useLayoutStore";
 import { leadsFormConfig } from "../configs/form.config";
 import { useCreateLead, useUpdateLead } from "../core/api";
 import { useLeadsStore } from "../core/store";
 import type { LeadFormData } from "../core/types";
-
-const useLeadsForm = () => {
-	const isOpen = useLeadsStore((state) => state.isFormOpen);
-	const formMode = useLeadsStore((state) => state.formMode);
-	const formInitialValues = useLeadsStore((state) => state.formInitialValues);
-	const closeForm = useLeadsStore((state) => state.closeForm);
-
-	const { isSidebarOpen, closeSidebar } = useLayoutStore();
-
-	const createLead = useCreateLead();
-	const updateLead = useUpdateLead();
-
-	useEffect(() => {
-		if (isOpen && isSidebarOpen) {
-			closeSidebar();
-		}
-	}, [isOpen, isSidebarOpen, closeSidebar]);
-
-	const handleSubmit = useCallback(
-		async (data: LeadFormData): Promise<void> => {
-			if (formMode === "create") {
-				await createLead.mutateAsync({
-					address: data.address,
-					company: data.company,
-					email: data.email,
-					firstName: data.firstName || "",
-					lastName: data.lastName || "",
-					note: data.note,
-					phone: data.phone,
-					priority: data.priority,
-					source: data.source as any,
-					status: data.status as any,
-				});
-				closeForm();
-			} else if (formMode === "edit") {
-				if (!formInitialValues) return;
-
-				await updateLead.mutateAsync({
-					id: Number(formInitialValues.id),
-					payload: {
-						address: data.address,
-						company: data.company,
-						email: data.email,
-						firstName: data.firstName,
-						lastName: data.lastName,
-						note: data.note,
-						phone: data.phone,
-						priority: data.priority,
-						source: data.source,
-						status: data.status,
-					},
-				});
-				closeForm();
-			}
-		},
-		[formMode, createLead, updateLead, closeForm, formInitialValues],
-	);
-
-	const handleClose = useCallback((): void => {
-		closeForm();
-	}, [closeForm]);
-
-	return {
-		formMode,
-		initialValues: formInitialValues as LeadFormData | undefined,
-		isOpen,
-		isPending: createLead.isPending || updateLead.isPending,
-		onClose: handleClose,
-		onSubmit: handleSubmit,
-	};
-};
+import { toCreatePayload, toFormData, toUpdatePayload, useLeadById } from "../core/utils";
 
 export function LeadsForm() {
-	const formState = useLeadsForm();
+  const { isFormOpen, formMode, formInitialValues, closeForm } = useLeadsStore();
+  const createLead = useCreateLead();
+  const updateLead = useUpdateLead();
+  const editId = formMode === "edit" && formInitialValues?.id ? Number(formInitialValues.id) : undefined;
+  const { data: leadData, isLoading: isLoadingLead } = useLeadById(editId);
 
-	return (
-		<FormBuilder<LeadFormData>
-			config={leadsFormConfig}
-			initialValues={formState.initialValues}
-			isLoading={formState.isPending}
-			isOpen={formState.isOpen}
-			key={`${formState.formMode}-${formState.initialValues?.id || "new"}`}
-			onClose={formState.onClose}
-			onSubmit={formState.onSubmit}
-		/>
-	);
+  const getInitialValues = (): LeadFormData | undefined => {
+    if (formMode === "edit" && leadData) {
+      return toFormData(leadData);
+    }
+    if (formMode === "create") {
+      return undefined;
+    }
+    return formInitialValues as LeadFormData;
+  };
+
+  const handleSubmit = useCallback(
+    async (data: LeadFormData) => {
+      if (formMode === "create") {
+        await createLead.mutateAsync(toCreatePayload(data));
+      } else if (formMode === "edit" && editId) {
+        await updateLead.mutateAsync({
+          id: editId,
+          payload: toUpdatePayload(data),
+        });
+      }
+      closeForm();
+    },
+    [formMode, editId, createLead, updateLead, closeForm],
+  );
+
+  return (
+    <FormBuilder<LeadFormData>
+      config={leadsFormConfig}
+      initialValues={getInitialValues()}
+      isLoading={createLead.isPending || updateLead.isPending || (formMode === "edit" && isLoadingLead)}
+      isOpen={isFormOpen}
+      key={`${formMode}-${editId || "new"}`}
+      onClose={closeForm}
+      onSubmit={handleSubmit}
+    />
+  );
 }

@@ -1,122 +1,154 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { getErrorMessage } from "@/api/core/httpClient";
+import { leadService } from "@/api/services";
+import type { LeadStatus } from "@/api/types";
+import { DeleteModal } from "@/features/shared/ui/components/DeleteModal";
+import { FileUploadModal } from "@/features/shared/ui/components/FileUploadModal";
 import type { ToolbarHandlers } from "@/features/shared/ui/toolbar";
 import { Toolbar, useToolbarContext } from "@/features/shared/ui/toolbar";
-import { leadsToolbarConfig } from "../configs/toolbar.config";
-import { useDeleteLead, useLeadsQuery, useRefreshLeads } from "../core/api";
+import { showToast } from "@/lib/utils/toast";
+import { useUserStore } from "@/store/useUserStore.";
+import { getLeadsToolbarConfig } from "../configs/toolbar.config";
+import { useLeadsQuery, useRefreshLeads } from "../core/api";
 import { useLeadsStore } from "../core/store";
-import { DeleteModal } from "@/features/shared/ui/components/DeleteModal";
 
-const useLeadsToolbar = () => {
-  const selectedFilter = useLeadsStore((state) => state.selectedFilter);
-  const selectedIds = useLeadsStore((state) => state.selectedIds);
-  const setSelectedIds = useLeadsStore((state) => state.setSelectedIds);
-  const openForm = useLeadsStore((state) => state.openForm);
-  const setToolbarFilter = useLeadsStore((state) => state.setToolbarFilter);
-
-  const selectedCount = selectedIds.length;
+export function LeadsToolbar() {
   const { setSelectedCount } = useToolbarContext();
-
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [leadNameToDelete, setLeadNameToDelete] = useState<string>("");
-
-  const deleteLead = useDeleteLead();
+  const { selectedIds, setSelectedIds, openForm, setToolbarFilter } = useLeadsStore();
+  const { users = [] } = useUserStore();
+  const { data = [] } = useLeadsQuery();
   const refreshLeads = useRefreshLeads();
-  const { data: leads = [] } = useLeadsQuery();
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [entityName, setEntityName] = useState("");
 
   useEffect(() => {
-    setSelectedCount(selectedCount);
-  }, [setSelectedCount, selectedCount]);
+    setSelectedCount(selectedIds.length);
+  }, [selectedIds, setSelectedCount]);
 
-  const handleDeleteConfirm = useCallback(async () => {
-    const { selectedIds: currentSelectedIds } = useLeadsStore.getState();
-    if (currentSelectedIds.length === 0) return;
-
-    await deleteLead.mutateAsync(currentSelectedIds[0]);
-    setSelectedIds([]);
-    setIsDeleteModalOpen(false);
-  }, [deleteLead, setSelectedIds]);
-
-  const handleDeleteCancel = useCallback(() => {
-    setIsDeleteModalOpen(false);
-    setLeadNameToDelete("");
-  }, []);
+  const handleFileUpload = async (file: File) => {
+    setIsUploading(true);
+    try {
+      const result = await leadService.importExcel(file, 1);
+      showToast.success(`${result.imported} سرنخ با موفقیت وارد شد`);
+      if (result.failed && result.failed > 0) {
+        showToast.info(`${result.failed} سرنخ با خطا مواجه شد`);
+      }
+      setUploadModalOpen(false);
+      refreshLeads();
+    } catch (error) {
+      showToast.error(getErrorMessage(error));
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handlers: ToolbarHandlers = {
-    onActionButtonClick: (buttonId: string): void => {
-      const { selectedIds: currentSelectedIds } = useLeadsStore.getState();
+    onActionButtonClick: (id) => {
+      if (id === "delete") {
+        if (selectedIds.length === 1) {
+          const item = data.find((d) => d.id === selectedIds[0]);
+          setEntityName(`${item?.firstName} ${item?.lastName}` || "");
+        } else {
+          setEntityName(`${selectedIds.length} سرنخ`);
+        }
+        setDeleteModalOpen(true);
+      }
 
-      switch (buttonId) {
-        case "bulk-update": {
-          refreshLeads();
-          break;
-        }
-        case "change-status": {
-          // Handle status change
-          break;
-        }
-        case "assign": {
-          // Handle assign
-          break;
-        }
-        case "delete": {
-          if (currentSelectedIds.length === 0) return;
-
-          const lead = leads.find((l) => l.id === currentSelectedIds[0]);
-          const name = (lead as { firstName?: string; lastName?: string })?.firstName
-            ? `${(lead as { firstName?: string }).firstName} ${(lead as { lastName?: string }).lastName}`
-            : "";
-          setLeadNameToDelete(name);
-          setIsDeleteModalOpen(true);
-          break;
-        }
-        default: {
-          break;
-        }
+      if (id === "bulk-update") {
+        useLeadsStore.getState().resetSelection();
+        refreshLeads();
       }
     },
 
-    onCreateClick: (): void => {
-      openForm("create");
+    onActionButtonPopoverConfirm: async (buttonId, selectedValues) => {
+      try {
+        if (buttonId === "change-status") {
+          const status = selectedValues[0] as LeadStatus;
+          await leadService.bulkChangeStatus({
+            leadIds: selectedIds,
+            status,
+          });
+          showToast.success("وضعیت سرنخ‌ها با موفقیت تغییر کرد");
+          setSelectedIds([]);
+          refreshLeads();
+        }
+
+        if (buttonId === "assign") {
+          const userId = Number(selectedValues[0]);
+          await leadService.bulkAssign({
+            leadIds: selectedIds,
+            assignedToUserId: userId,
+          });
+          showToast.success("سرنخ‌ها با موفقیت تخصیص داده شدند");
+          setSelectedIds([]);
+          refreshLeads();
+        }
+      } catch (error) {
+        showToast.error(getErrorMessage(error));
+      }
     },
 
-    onFilterChange: (value: string): void => {
+    onCreateClick: () => openForm("create"),
+
+    onCreateDropdownClick: (option) => {
+      if (option.value === "import-excel") {
+        setUploadModalOpen(true);
+      }
+    },
+
+    onFilterChange: (value) => {
       setToolbarFilter(value);
     },
   };
 
-  return {
-    deleteModal: {
-      isLoading: deleteLead.isPending,
-      isOpen: isDeleteModalOpen,
-      leadName: leadNameToDelete,
-      onClose: handleDeleteCancel,
-      onConfirm: handleDeleteConfirm,
-    },
-    handlers,
-    state: {
-      selectedCount,
-      selectedFilter,
-    },
-  };
-};
-
-export function LeadsToolbar() {
-  const { handlers, deleteModal } = useLeadsToolbar();
+  const handleDelete = useCallback(async () => {
+    setIsDeleting(true);
+    try {
+      await leadService.bulkDelete({
+        leadIds: selectedIds,
+      });
+      showToast.success(
+        selectedIds.length === 1 ? "سرنخ با موفقیت حذف شد" : `${selectedIds.length} سرنخ با موفقیت حذف شدند`,
+      );
+      setSelectedIds([]);
+      setDeleteModalOpen(false);
+      refreshLeads();
+    } catch (error) {
+      showToast.error(getErrorMessage(error));
+    } finally {
+      setIsDeleting(false);
+    }
+  }, [selectedIds, setSelectedIds, refreshLeads]);
 
   return (
-    <div className='w-full'>
-      <Toolbar config={leadsToolbarConfig} handlers={handlers} />
+    <>
+      <Toolbar config={getLeadsToolbarConfig(users)} handlers={handlers} />
 
       <DeleteModal
+        entityName={entityName}
         entityType='سرنخ'
-        entityName={deleteModal.leadName}
-        isOpen={deleteModal.isOpen}
-        isLoading={deleteModal.isLoading}
-        onClose={deleteModal.onClose}
-        onConfirm={deleteModal.onConfirm}
+        isLoading={isDeleting}
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleDelete}
       />
-    </div>
+
+      <FileUploadModal
+        acceptedFormats={[".xlsx", ".xls"]}
+        description='فایل اکسل حاوی اطلاعات سرنخ‌ها را انتخاب کنید'
+        isLoading={isUploading}
+        isOpen={uploadModalOpen}
+        maxSizeMB={10}
+        onClose={() => setUploadModalOpen(false)}
+        onSubmit={handleFileUpload}
+        title='آپلود فایل اکسل سرنخ‌ها'
+      />
+    </>
   );
 }

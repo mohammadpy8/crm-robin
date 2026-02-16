@@ -1,4 +1,5 @@
 import type { ColumnConfig } from "@/features/shared/ui/table";
+import type { UserOption } from "@/store/useUserStore.";
 
 export const statusLabels: Record<string, string> = {
   contacted: "تماس گرفته شده",
@@ -25,7 +26,7 @@ export const priorityLabels: Record<string, string> = {
   urgent: "فوری",
 };
 
-export const getLeadsColumnConfig = (): ColumnConfig[] => [
+export const getLeadsColumnConfig = (users: UserOption[] = []): ColumnConfig[] => [
   {
     accessorKey: "firstName",
     enableFiltering: true,
@@ -94,14 +95,13 @@ export const getLeadsColumnConfig = (): ColumnConfig[] => [
     enableSorting: true,
     filterType: "select-single",
     header: "ارجاع به",
-    selectOptions: [
-      { label: "یوزر 1", value: "1" },
-      { label: "یوزر 2", value: "9" },
-    ],
+    selectOptions: users.map((user) => ({
+      label: user.label,
+      value: String(user.value),
+    })),
     size: 140,
     sortableFieldName: "assignedToUserId",
   },
-
   {
     accessorKey: "company",
     enableFiltering: true,
