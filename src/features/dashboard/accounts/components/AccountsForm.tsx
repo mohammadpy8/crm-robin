@@ -11,16 +11,13 @@ import { toCreatePayload, toFormData, toUpdatePayload, useAccountById } from "..
 
 export function AccountsForm() {
   const { isFormOpen, formMode, formInitialValues, closeForm } = useAccountsStore();
-  const { users, loading: usersLoading, fetchUsers } = useUserStore();
+  const { users, loading: usersLoading } = useUserStore();
   const createAccount = useCreateAccount();
   const updateAccount = useUpdateAccount();
   const editId = formMode === "edit" && formInitialValues?.id ? Number(formInitialValues.id) : undefined;
   const { data: accountData, isLoading: isLoadingAccount } = useAccountById(editId);
   const accountsFormConfig = getAccountsFormConfig(users, usersLoading);
 
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
 
   const getInitialValues = (): AccountFormData | undefined => {
     if (formMode === "edit" && accountData) {

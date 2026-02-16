@@ -1,12 +1,10 @@
-import type { CompanyEntity } from "@/api/types";
+import type { CompanyEntity, UpdateCompanyDto } from "@/api/types";
 import { toJalali } from "@/lib/utils/dateUtils";
 import type { AccountFormData, AccountTableRow } from "./types";
 import { useQuery } from "@tanstack/react-query";
 import { companyService } from "@/api/services";
 
-
 export const ITEMS_PER_PAGE = 3;
-
 
 export const toTableRow = (company: CompanyEntity): AccountTableRow => ({
   id: company.id,
@@ -20,7 +18,6 @@ export const toTableRow = (company: CompanyEntity): AccountTableRow => ({
   createdAt: toJalali(company.createdAt || ""),
   website: "--",
 });
-
 
 export const toFormData = (company: CompanyEntity): AccountFormData => ({
   name: company.name,
@@ -46,8 +43,7 @@ export const toCreatePayload = (data: AccountFormData) => ({
   assignedToUserId: data.assignedToUserId ? Number(data.assignedToUserId) : undefined,
 });
 
-
-export const toUpdatePayload = (data: AccountFormData) => ({
+export const toUpdatePayload = (data: AccountFormData): UpdateCompanyDto => ({
   name: data.name,
   email: data.email,
   phone: data.phone,
@@ -59,7 +55,6 @@ export const toUpdatePayload = (data: AccountFormData) => ({
   assignedToUserId: data.assignedToUserId ? Number(data.assignedToUserId) : undefined,
 });
 
-
 export const useAccountById = (id?: number) => {
   return useQuery({
     queryKey: ["accounts", "detail", id],
@@ -68,5 +63,3 @@ export const useAccountById = (id?: number) => {
     staleTime: 0,
   });
 };
-
-

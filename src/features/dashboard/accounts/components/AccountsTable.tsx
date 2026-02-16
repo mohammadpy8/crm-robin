@@ -16,14 +16,11 @@ const useAccountsTable = createTableHandlers<TableRow>({
 });
 
 export function AccountsTable() {
-  const { users, fetchUsers } = useUserStore();
+  const { users } = useUserStore();
   const { state, handlers } = useAccountsTable();
   const totalItems = useAccountsStore((store) => store.totalItems);
   const selectedIds = useAccountsStore((store) => store.selectedIds);
 
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
 
   const columns = getAccountsColumnConfig(users);
 
