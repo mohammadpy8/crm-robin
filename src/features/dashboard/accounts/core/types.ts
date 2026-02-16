@@ -1,29 +1,32 @@
+import type { CompanyLevel, CompanyStatus } from "@/api/types";
 import type { FilterValue } from "@/features/shared/ui/table";
 
-export enum CompanyStatus {
-  ACTIVE = "active",
-  PASSIVE = "passive",
-  SUSPENSION = "suspension",
-}
-
-export enum CompanyLevel {
-  GOLD = "gold",
-  SILVER = "silver",
-  BRONZE = "bronze",
-}
+export type { CompanyLevel, CompanyStatus } from "@/api/types";
 
 export interface AccountFormData {
-  [key: string]: string | undefined;
-  id?: string;
-  name?: string;
+  [key: string]: string | number | undefined | CompanyStatus | CompanyLevel;
+  name: string;
   email?: string;
-  phone?: string;
+  phone: string;
   status?: CompanyStatus;
   level?: CompanyLevel;
   nationalId?: string;
   assignedToUserId?: string;
   address?: string;
   note?: string;
+}
+
+export interface AccountTableRow {
+  [key: string]: string | number | undefined;
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  nationalId: string;
+  status: string;
+  level: string;
+  assignedToUserId: string;
+  createdAt: string;
 }
 
 export type FormMode = "create" | "edit" | "view";

@@ -1,63 +1,21 @@
 import { companyService } from "@/api/services";
-import type { CompanyEntity, CreateCompanyDto, PaginatedCompaniesResponse, UpdateCompanyDto } from "@/api/types";
+import type { CreateCompanyDto, UpdateCompanyDto } from "@/api/types";
 import type { BaseQueryParams } from "@/features/shared/factories/createApiHooks";
 import { createApiHooks } from "@/features/shared/factories/createApiHooks";
-import type { TableRow } from "@/features/shared/ui/table";
-import { toJalali } from "@/lib/utils/dateUtils";
 import { useAccountsStore } from "./store";
-
-const ITEMS_PER_PAGE = 3;
-
-export interface UpdateAccountPayload {
-	data: UpdateCompanyDto;
-}
-
-export const transformAccountsToTableRows = (items: CompanyEntity[]): TableRow[] =>
-	items.map((company) => ({
-		assignedToUserId: String(company.assignedToUserId),
-		createdAt: toJalali(company.createdAt || ""),
-		email: company.email || "",
-		id: company.id,
-		level: company.level || "",
-		name: company.name,
-		nationalId: company.nationalId,
-		phone: company.phone,
-		status:company.status || "",
-		website: "--",
-	}));
-
-export const transformCompanyToFormData = (company: CompanyEntity) => ({
-	address: company.address || "",
-	assignedToUserId: company.assignedToUserId,
-	email: company.email,
-	id: company.id,
-	level: company.level,
-	name: company.name,
-	nationalId: company.nationalId,
-	note: company.note || "",
-	phone: company.phone,
-	status: company.status,
-});
+import type { AccountTableRow } from "./types";
+import { ITEMS_PER_PAGE, toTableRow } from "./utils";
 
 const accountsService = {
-	create: async (payload: CreateCompanyDto): Promise<TableRow> => {
-		const res = await companyService.create(payload);
-		return transformAccountsToTableRows([res])[0];
-	},
-
-	delete: async (id: number): Promise<void> => {
-		await companyService.delete(id);
-	},
-
-	getAll: async (params?: BaseQueryParams): Promise<TableRow[]> => {
+  getAll: async (params?: BaseQueryParams): Promise<AccountTableRow[]> => {
     const page = Math.max(1, Number(params?.page ?? 1));
     const limit = ITEMS_PER_PAGE;
-  
+
     const cleanParams: Record<string, any> = {
-      limit,
       page,
+      limit,
     };
-  
+
     if (params?.filters && Object.keys(params.filters).length > 0) {
       Object.entries(params.filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== "") {
@@ -65,44 +23,46 @@ const accountsService = {
         }
       });
     }
-  
+
     if (params?.sortField && params?.sortOrder) {
       cleanParams.sortField = params.sortField;
       cleanParams.sortOrder = params.sortOrder.toUpperCase();
     }
-  
-    const res: PaginatedCompaniesResponse = await companyService.getAll(cleanParams);
 
-    useAccountsStore.getState().setTotalItems(res.total);
-  
-    return transformAccountsToTableRows(res.data);
+    const response = await companyService.getAll(cleanParams);
+
+    useAccountsStore.getState().setTotalItems(response.total);
+
+    return response.data.map(toTableRow);
   },
 
-	getById: async (id: number) => {
-		const company = await companyService.getById(id);
-		return transformCompanyToFormData(company);
-	},
+  create: async (payload: CreateCompanyDto): Promise<AccountTableRow> => {
+    const company = await companyService.create(payload);
+    return toTableRow(company);
+  },
 
-	update: async (id: number, payload: UpdateAccountPayload): Promise<TableRow> => {
-		const res = await companyService.update(id, payload.data);
-		return transformAccountsToTableRows([res])[0];
-	},
+  update: async (id: number, payload: UpdateCompanyDto): Promise<AccountTableRow> => {
+    const company = await companyService.update(id, payload);
+    return toTableRow(company);
+  },
+
+  delete: async (id: number): Promise<void> => {
+    await companyService.delete(id);
+  },
 };
 
 export const {
-	useListQuery: useAccountsQuery,
-	useCreate: useCreateAccount,
-	useUpdate: useUpdateAccount,
-	useDelete: useDeleteAccount,
-	useRefresh: useRefreshAccounts,
-} = createApiHooks<TableRow, CreateCompanyDto, UpdateAccountPayload>({
-	messages: {
-		createSuccess: "سازمان با موفقیت ایجاد شد",
-		deleteSuccess: "سازمان با موفقیت حذف شد",
-		updateSuccess: "سازمان با موفقیت ویرایش شد",
-	},
-	queryKey: "accounts",
-	service: accountsService,
+  useListQuery: useAccountsQuery,
+  useCreate: useCreateAccount,
+  useUpdate: useUpdateAccount,
+  useDelete: useDeleteAccount,
+  useRefresh: useRefreshAccounts,
+} = createApiHooks<AccountTableRow, CreateCompanyDto, UpdateCompanyDto>({
+  queryKey: "accounts",
+  service: accountsService,
+  messages: {
+    createSuccess: "سازمان با موفقیت ایجاد شد",
+    updateSuccess: "سازمان با موفقیت ویرایش شد",
+    deleteSuccess: "سازمان با موفقیت حذف شد",
+  },
 });
-
-export { accountsService };

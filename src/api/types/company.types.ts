@@ -10,6 +10,11 @@ export enum CompanyLevel {
 	BRONZE = "bronze",
 }
 
+export interface UserReference {
+	id: number;
+	fullName: string;
+}
+
 export interface CreateCompanyDto {
 	name: string;
 	email?: string;
@@ -70,6 +75,7 @@ export interface UploadCompaniesExcelDto {
 	assignedToUserId?: number;
 }
 
+// CompanyEntity با nested objects (برای هر دو list و detail)
 export interface CompanyEntity {
 	id: number;
 	name: string;
@@ -77,11 +83,14 @@ export interface CompanyEntity {
 	phone: string;
 	nationalId: string;
 	note?: string;
+	address?: string;
 	status?: CompanyStatus;
 	level?: CompanyLevel;
-	address?: string;
+	assignedToUser?: UserReference;
 	assignedToUserId: number;
+	assignedByUser?: UserReference;
 	assignedByUserId: number;
+	assignedAt?: string;
 	createdAt?: string;
 	updatedAt?: string;
 }

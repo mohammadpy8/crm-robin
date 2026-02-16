@@ -9,17 +9,17 @@ import { AccountsToolbar } from "./components/AccountsToolbar";
 import { useAccountsStore } from "./core/store";
 
 export default function AccountList() {
-	useDebugStore("AccountsStore", useAccountsStore);
+  useDebugStore("AccountsStore", useAccountsStore);
 
-	return (
-		<>
-			<AccountsForm />
-			<ToolbarProvider defaultFilter={{ label: "همه سازمان‌ها", value: "all" }}>
-				<AccountsToolbar />
-			</ToolbarProvider>
-			<Suspense fallback={null}>
-				<AccountsTable />
-			</Suspense>
-		</>
-	);
+  return (
+    <>
+      <AccountsForm />
+      <ToolbarProvider defaultFilter={{ label: "همه سازمان‌ها", value: "all" }}>
+        <AccountsToolbar />
+      </ToolbarProvider>
+      <Suspense fallback={null}>
+        <AccountsTable />
+      </Suspense>
+    </>
+  );
 }
