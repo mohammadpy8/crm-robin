@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/complexity/noExcessiveCognitiveComplexity: <> */
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
@@ -8,113 +9,87 @@ import { usersToolbarConfig } from "../configs/toolbar.config";
 import { useDeleteUser, useRefreshUsers, useUsersQuery } from "../core/api";
 import { useUsersStore } from "../core/store";
 
-const useUsersToolbar = () => {
-	const selectedFilter = useUsersStore((state) => state.selectedFilter);
-	const selectedIds = useUsersStore((state) => state.selectedIds);
-	const setSelectedIds = useUsersStore((state) => state.setSelectedIds);
-	const openForm = useUsersStore((state) => state.openForm);
-	const setToolbarFilter = useUsersStore((state) => state.setToolbarFilter);
-
-	const selectedCount = selectedIds.length;
+export function UsersToolbar() {
 	const { setSelectedCount } = useToolbarContext();
-
-	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-	const [userNameToDelete, setUserNameToDelete] = useState<string>("");
-
+	const { selectedIds, setSelectedIds, openForm, setToolbarFilter } = useUsersStore();
+	const { data = [] } = useUsersQuery();
 	const deleteUser = useDeleteUser();
 	const refreshUsers = useRefreshUsers();
-	const { data: users = [] } = useUsersQuery();
+
+	const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+	const [isDeleting, setIsDeleting] = useState(false);
+	const [entityName, setEntityName] = useState("");
 
 	useEffect(() => {
-		setSelectedCount(selectedCount);
-	}, [setSelectedCount, selectedCount]);
-
-	const handleDeleteConfirm = useCallback(async () => {
-		const { selectedIds: currentSelectedIds } = useUsersStore.getState();
-		if (currentSelectedIds.length === 0) {
-			return;
-		}
-
-		await deleteUser.mutateAsync(currentSelectedIds[0]);
-		setSelectedIds([]);
-		setIsDeleteModalOpen(false);
-	}, [deleteUser, setSelectedIds]);
-
-	const handleDeleteCancel = useCallback(() => {
-		setIsDeleteModalOpen(false);
-		setUserNameToDelete("");
-	}, []);
+		setSelectedCount(selectedIds.length);
+	}, [selectedIds, setSelectedCount]);
 
 	const handlers: ToolbarHandlers = {
-		onActionButtonClick: (buttonId: string): void => {
-			const { selectedIds: currentSelectedIds } = useUsersStore.getState();
+		onActionButtonClick: (id) => {
+			if (id === "delete") {
+				if (selectedIds.length === 1) {
+					const item = data.find((d) => d.id === selectedIds[0]);
+					setEntityName((item as { fullName?: string })?.fullName || "");
+				} else {
+					setEntityName(`${selectedIds.length} کاربر`);
+				}
+				setDeleteModalOpen(true);
+			}
 
-			switch (buttonId) {
-				case "bulk-update": {
-					refreshUsers();
-					break;
-				}
-				case "reset-password": {
-					openForm("edit");
-					break;
-				}
-				case "delete": {
-					if (currentSelectedIds.length === 0) {
-						return;
+			if (id === "bulk-update") {
+				useUsersStore.getState().resetSelection();
+				refreshUsers();
+			}
+
+			if (id === "reset-password") {
+				if (selectedIds.length === 1) {
+					const item = data.find((d) => d.id === selectedIds[0]);
+					if (item) {
+						openForm("edit", {
+							email: (item as { email?: string })?.email || "",
+							fullName: (item as { fullName?: string })?.fullName || "",
+							id: String(item.id),
+							mobile: (item as { phone?: string })?.phone || "",
+						});
 					}
-
-					const user = users.find((u) => u.id === currentSelectedIds[0]);
-					const name = (user as { fullName?: string })?.fullName || "";
-					setUserNameToDelete(name);
-					setIsDeleteModalOpen(true);
-					break;
-				}
-				default: {
-					break;
 				}
 			}
 		},
 
-		onCreateClick: (): void => {
-			openForm("create");
-		},
+		onCreateClick: () => openForm("create"),
 
-		onFilterChange: (value: string): void => {
+		onFilterChange: (value) => {
 			setToolbarFilter(value);
 		},
 	};
 
-	return {
-		deleteModal: {
-			isLoading: deleteUser.isPending,
-			isOpen: isDeleteModalOpen,
-			onClose: handleDeleteCancel,
-			onConfirm: handleDeleteConfirm,
-			userName: userNameToDelete,
-		},
-		handlers,
-		state: {
-			selectedCount,
-			selectedFilter,
-		},
-	};
-};
-
-export function UsersToolbar() {
-	const { handlers, deleteModal } = useUsersToolbar();
+	const handleDelete = useCallback(async () => {
+		if (selectedIds.length === 0) {return;}
+		setIsDeleting(true);
+		try {
+			await deleteUser.mutateAsync(selectedIds[0]);
+			setSelectedIds([]);
+			setDeleteModalOpen(false);
+			refreshUsers();
+		} catch (error) {
+			console.error("Error deleting user:", error);
+		} finally {
+			setIsDeleting(false);
+		}
+	}, [selectedIds, deleteUser, setSelectedIds, refreshUsers]);
 
 	return (
-		<div className="w-full">
+		<>
 			<Toolbar config={usersToolbarConfig} handlers={handlers} />
 
 			<DeleteModal
-				entityName={deleteModal.userName}
+				entityName={entityName}
 				entityType="کاربر"
-				isLoading={deleteModal.isLoading}
-				isOpen={deleteModal.isOpen}
-				onClose={deleteModal.onClose}
-				onConfirm={deleteModal.onConfirm}
+				isLoading={isDeleting}
+				isOpen={deleteModalOpen}
+				onClose={() => setDeleteModalOpen(false)}
+				onConfirm={handleDelete}
 			/>
-		</div>
+		</>
 	);
 }

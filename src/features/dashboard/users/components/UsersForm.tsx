@@ -8,26 +8,40 @@ import { getUsersFormConfig } from "../configs/form.config";
 import { useCreateUser, useUpdateUser } from "../core/api";
 import { useUsersStore } from "../core/store";
 import type { UserFormData } from "../core/types";
+import { toFormData, useUserById } from "../core/utils";
 
-const useUsersForm = () => {
-	const isOpen = useUsersStore((state) => state.isFormOpen);
-	const formMode = useUsersStore((state) => state.formMode);
-	const formInitialValues = useUsersStore((state) => state.formInitialValues);
-	const closeForm = useUsersStore((state) => state.closeForm);
-
+export function UsersForm() {
+	const { isFormOpen, formMode, formInitialValues, closeForm } = useUsersStore();
+	const { roles } = useRoleStore();
 	const { isSidebarOpen, closeSidebar } = useLayoutStore();
 
 	const createUser = useCreateUser();
 	const updateUser = useUpdateUser();
 
+	const editId =
+		formMode === "edit" && formInitialValues?.id
+			? Number(formInitialValues.id)
+			: undefined;
+	const { data: userData, isLoading: isLoadingUser } = useUserById(editId);
+
 	useEffect(() => {
-		if (isOpen && isSidebarOpen) {
+		if (isFormOpen && isSidebarOpen) {
 			closeSidebar();
 		}
-	}, [isOpen, isSidebarOpen, closeSidebar]);
+	}, [isFormOpen, isSidebarOpen, closeSidebar]);
+
+	const getInitialValues = (): UserFormData | undefined => {
+		if (formMode === "edit" && userData) {
+			return toFormData(userData);
+		}
+		if (formMode === "create") {
+			return;
+		}
+		return formInitialValues as UserFormData;
+	};
 
 	const handleSubmit = useCallback(
-		async (data: UserFormData): Promise<void> => {
+		async (data: UserFormData) => {
 			if (formMode === "create") {
 				await createUser.mutateAsync({
 					email: data.email || "",
@@ -35,13 +49,9 @@ const useUsersForm = () => {
 					password: data.password || "",
 					phoneNumber: data.mobile || "",
 				});
-				closeForm();
-			} else if (formMode === "edit") {
-				if (!formInitialValues) {return;}
-				
-
+			} else if (formMode === "edit" && editId) {
 				await updateUser.mutateAsync({
-					id: Number(formInitialValues.id),
+					id: editId,
 					payload: {
 						data: {
 							email: data.email,
@@ -52,41 +62,25 @@ const useUsersForm = () => {
 						roleId: data.role ? Number(data.role) : undefined,
 					},
 				});
-				closeForm();
 			}
+			closeForm();
 		},
-		[formMode, createUser, updateUser, closeForm, formInitialValues],
+		[formMode, editId, createUser, updateUser, closeForm],
 	);
-
-	const handleClose = useCallback((): void => {
-		closeForm();
-	}, [closeForm]);
-
-	return {
-		formMode,
-		initialValues: formInitialValues as UserFormData | undefined,
-		isOpen,
-		isPending: createUser.isPending || updateUser.isPending,
-		onClose: handleClose,
-		onSubmit: handleSubmit,
-	};
-};
-
-export function UsersForm() {
-	const { roles } = useRoleStore();
-	const formState = useUsersForm();
-
-	const config = getUsersFormConfig(roles);
 
 	return (
 		<FormBuilder<UserFormData>
-			config={config}
-			initialValues={formState.initialValues}
-			isLoading={formState.isPending}
-			isOpen={formState.isOpen}
-			key={`${formState.formMode}-${formState.initialValues?.id || "new"}`}
-			onClose={formState.onClose}
-			onSubmit={formState.onSubmit}
+			config={getUsersFormConfig(roles)}
+			initialValues={getInitialValues()}
+			isLoading={
+				createUser.isPending ||
+				updateUser.isPending ||
+				(formMode === "edit" && isLoadingUser)
+			}
+			isOpen={isFormOpen}
+			key={`${formMode}-${editId || "new"}`}
+			onClose={closeForm}
+			onSubmit={handleSubmit}
 		/>
 	);
 }
