@@ -55,11 +55,8 @@ export interface User extends UserListItem {
 }
 
 export interface PaginatedUserResponse {
-	data: User[];
-	meta: {
-		total: number;
-		page: number;
-		limit: number;
-		totalPages: number;
-	};
+  data: User[];
+  total: number;
+  page: number;
+  limit: number;
 }

@@ -7,6 +7,8 @@ export type {
   UpdateUserDto,
   UserEntity,
   UserListItem,
+  PaginatedUserResponse,
+  User,
 } from "./auth.types";
 export {
   type AssignCompanyDto,
