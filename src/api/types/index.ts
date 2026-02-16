@@ -56,7 +56,6 @@ export {
   LeadStatus,
   type PaginatedLeadsResponse,
   type UpdateLeadDto,
-  type UploadLeadsExcelDto,
 } from "./lead.types";
 
 export type { PaginatedRolesResponse, RoleEntity, RoleOption, RoleQueryParams } from "./role.types";

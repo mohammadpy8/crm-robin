@@ -3,79 +3,72 @@ import { API_CONFIG } from "@/api/core/config";
 import { http } from "@/api/core/httpClient";
 import buildQueryString from "@/lib/utils/queryString";
 import type {
-	AssignLeadDto,
-	BulkAssignLeadsDto,
-	BulkChangeLeadStatusDto,
-	BulkDeleteLeadsDto,
-	ChangeLeadStatusDto,
-	CreateLeadDto,
-	ImportLeadsResponse,
-	LeadEntity,
-	LeadQueryParams,
-	PaginatedLeadsResponse,
-	UpdateLeadDto,
+  AssignLeadDto,
+  BulkAssignLeadsDto,
+  BulkChangeLeadStatusDto,
+  BulkDeleteLeadsDto,
+  BulkOperationResponse,
+  ChangeLeadStatusDto,
+  CreateLeadDto,
+  ImportLeadsResponse,
+  LeadEntity,
+  LeadQueryParams,
+  PaginatedLeadsResponse,
+  UpdateLeadDto,
 } from "../types";
 
 export const leadService = {
-	assign: async (id: number, data: AssignLeadDto): Promise<LeadEntity> => {
-		return http.patch<LeadEntity>(API_CONFIG.ENDPOINTS.LEAD.ASSIGN(id), data);
-	},
+  create: async (data: CreateLeadDto): Promise<LeadEntity> => {
+    return http.post<LeadEntity>(API_CONFIG.ENDPOINTS.LEAD.BASE, data);
+  },
 
-	bulkAssign: async (data: BulkAssignLeadsDto): Promise<void> => {
-		return http.post<void>(API_CONFIG.ENDPOINTS.LEAD.BULK_ASSIGN, data);
-	},
+  getAll: async (params?: LeadQueryParams): Promise<PaginatedLeadsResponse> => {
+    return http.get<PaginatedLeadsResponse>(`${API_CONFIG.ENDPOINTS.LEAD.BASE}${buildQueryString(params)}`);
+  },
 
-	bulkChangeStatus: async (data: BulkChangeLeadStatusDto): Promise<void> => {
-		return http.post<void>(API_CONFIG.ENDPOINTS.LEAD.BULK_STATUS, data);
-	},
+  getById: async (id: number): Promise<LeadEntity> => {
+    return http.get<LeadEntity>(API_CONFIG.ENDPOINTS.LEAD.BY_ID(id));
+  },
 
-	bulkDelete: async (data: BulkDeleteLeadsDto): Promise<void> => {
-		return http.post<void>(API_CONFIG.ENDPOINTS.LEAD.BULK_DELETE, data);
-	},
+  update: async (id: number, data: UpdateLeadDto): Promise<LeadEntity> => {
+    return http.patch<LeadEntity>(API_CONFIG.ENDPOINTS.LEAD.BY_ID(id), data);
+  },
 
-	changeStatus: async (id: number, data: ChangeLeadStatusDto): Promise<LeadEntity> => {
-		return http.patch<LeadEntity>(API_CONFIG.ENDPOINTS.LEAD.STATUS(id), data);
-	},
+  delete: async (id: number): Promise<void> => {
+    return http.delete<void>(API_CONFIG.ENDPOINTS.LEAD.BY_ID(id));
+  },
 
-	convert: async (id: number): Promise<LeadEntity> => {
-		return http.patch<LeadEntity>(API_CONFIG.ENDPOINTS.LEAD.CONVERT(id));
-	},
-	create: async (data: CreateLeadDto): Promise<LeadEntity> => {
-		return http.post<LeadEntity>(API_CONFIG.ENDPOINTS.LEAD.BASE, data);
-	},
+  assign: async (id: number, data: AssignLeadDto): Promise<LeadEntity> => {
+    return http.patch<LeadEntity>(API_CONFIG.ENDPOINTS.LEAD.ASSIGN(id), data);
+  },
 
-	delete: async (id: number): Promise<void> => {
-		return http.delete<void>(API_CONFIG.ENDPOINTS.LEAD.BY_ID(id));
-	},
+  convert: async (id: number): Promise<LeadEntity> => {
+    return http.patch<LeadEntity>(API_CONFIG.ENDPOINTS.LEAD.CONVERT(id));
+  },
 
-	getAll: async (params?: LeadQueryParams): Promise<PaginatedLeadsResponse> => {
-		return http.get<PaginatedLeadsResponse>(
-			`${API_CONFIG.ENDPOINTS.LEAD.BASE}${buildQueryString(params)}`,
-		);
-	},
+  bulkAssign: async (data: BulkAssignLeadsDto): Promise<BulkOperationResponse> => {
+    return http.post<BulkOperationResponse>(API_CONFIG.ENDPOINTS.LEAD.BULK_ASSIGN, data);
+  },
 
-	getById: async (id: number): Promise<LeadEntity> => {
-		return http.get<LeadEntity>(API_CONFIG.ENDPOINTS.LEAD.BY_ID(id));
-	},
+  bulkDelete: async (data: BulkDeleteLeadsDto): Promise<BulkOperationResponse> => {
+    return http.post<BulkOperationResponse>(API_CONFIG.ENDPOINTS.LEAD.BULK_DELETE, data);
+  },
 
-	importExcel: async (
-		file: File,
-		assignedToUserId?: number,
-	): Promise<ImportLeadsResponse> => {
-		const formData = new FormData();
-		formData.append("file", file);
-		if (assignedToUserId) {
-			formData.append("assignedToUserId", assignedToUserId.toString());
-		}
+  bulkChangeStatus: async (data: BulkChangeLeadStatusDto): Promise<BulkOperationResponse> => {
+    return http.post<BulkOperationResponse>(API_CONFIG.ENDPOINTS.LEAD.BULK_STATUS, data);
+  },
 
-		return http.post<ImportLeadsResponse>(API_CONFIG.ENDPOINTS.LEAD.IMPORT, formData, {
-			headers: {
-				"Content-Type": "multipart/form-data",
-			},
-		});
-	},
+  changeStatus: async (id: number, data: ChangeLeadStatusDto): Promise<LeadEntity> => {
+    return http.patch<LeadEntity>(API_CONFIG.ENDPOINTS.LEAD.STATUS(id), data);
+  },
 
-	update: async (id: number, data: UpdateLeadDto): Promise<LeadEntity> => {
-		return http.patch<LeadEntity>(API_CONFIG.ENDPOINTS.LEAD.BY_ID(id), data);
-	},
+  importExcel: async (file: File, assignedToUserId?: number): Promise<ImportLeadsResponse> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    if (assignedToUserId) {
+      formData.append("assignedToUserId", assignedToUserId.toString());
+    }
+
+    return http.post<ImportLeadsResponse>(API_CONFIG.ENDPOINTS.LEAD.IMPORT, formData);
+  },
 };
