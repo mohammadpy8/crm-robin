@@ -10,12 +10,12 @@ export const showToast = {
       style: {
         background: "#fff",
         color: "#0f172a",
-        fontFamily: "IRANYekan",
         padding: "16px 20px",
         borderRadius: "12px",
         border: "1px solid #d1fae5",
         boxShadow: "0 4px 12px rgba(16, 185, 129, 0.15)",
         maxWidth: "500px",
+        fontSize: "12px",
       },
     }),
 
@@ -27,12 +27,12 @@ export const showToast = {
       style: {
         background: "#fff",
         color: "#0f172a",
-        fontFamily: "IRANYekan",
         padding: "16px 20px",
         borderRadius: "12px",
         border: "1px solid #fecaca",
         boxShadow: "0 4px 12px rgba(239, 68, 68, 0.15)",
         maxWidth: "500px",
+        fontSize: "12px",
       },
     }),
 
@@ -43,12 +43,12 @@ export const showToast = {
       style: {
         background: "#fff",
         color: "#0f172a",
-        fontFamily: "IRANYekan",
         padding: "16px 20px",
         borderRadius: "12px",
         border: "1px solid #dbeafe",
         boxShadow: "0 4px 12px rgba(59, 130, 246, 0.15)",
         maxWidth: "500px",
+        fontSize: "12px",
       },
     }),
 
@@ -60,12 +60,12 @@ export const showToast = {
       style: {
         background: "#fff",
         color: "#0f172a",
-        fontFamily: "IRANYekan",
         padding: "16px 20px",
         borderRadius: "12px",
         border: "1px solid #dbeafe",
         boxShadow: "0 4px 12px rgba(59, 130, 246, 0.15)",
         maxWidth: "500px",
+        fontSize: "12px",
       },
     }),
 
@@ -90,6 +90,7 @@ export const showToast = {
           padding: "16px 20px",
           borderRadius: "12px",
           maxWidth: "500px",
+          fontSize: "12px",
         },
         success: {
           icon: <CheckCircle2 className='h-5 w-5 text-emerald-500' />,
@@ -97,6 +98,7 @@ export const showToast = {
             background: "#fff",
             border: "1px solid #d1fae5",
             boxShadow: "0 4px 12px rgba(16, 185, 129, 0.15)",
+            fontSize: "12px",
           },
         },
         error: {
@@ -105,6 +107,7 @@ export const showToast = {
             background: "#fff",
             border: "1px solid #fecaca",
             boxShadow: "0 4px 12px rgba(239, 68, 68, 0.15)",
+            fontSize: "12px",
           },
         },
         loading: {
@@ -113,6 +116,7 @@ export const showToast = {
             background: "#fff",
             border: "1px solid #dbeafe",
             boxShadow: "0 4px 12px rgba(59, 130, 246, 0.15)",
+            fontSize: "12px",
           },
         },
       },
