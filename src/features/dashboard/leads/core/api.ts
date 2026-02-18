@@ -5,7 +5,7 @@ import type { BaseQueryParams } from "@/features/shared/factories/createApiHooks
 import { createApiHooks } from "@/features/shared/factories/createApiHooks";
 import { useLeadsStore } from "./store";
 import type { LeadTableRow } from "./types";
-import { ITEMS_PER_PAGE, toTableRow } from "./utils";
+import { toTableRow } from "./utils";
 
 const leadsService = {
 	create: async (payload: CreateLeadDto): Promise<LeadTableRow> => {
@@ -18,7 +18,7 @@ const leadsService = {
 	},
 	getAll: async (params?: BaseQueryParams): Promise<LeadTableRow[]> => {
 		const page = Math.max(1, Number(params?.page ?? 1));
-		const limit = ITEMS_PER_PAGE;
+		const limit = Number(process.env.NEXT_PUBLIC_ITEMS_PER_PAGE);
 
 		const cleanParams: Record<string, any> = {
 			limit,

@@ -4,7 +4,6 @@ import type { User } from "@/api/types";
 import { toJalali } from "@/lib/utils/dateUtils";
 import type { UserFormData, UserTableRow } from "./types";
 
-export const ITEMS_PER_PAGE = 3;
 
 export const toTableRow = (user: User): UserTableRow => ({
 	createdAt: toJalali(user.createdAt || ""),

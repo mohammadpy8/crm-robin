@@ -5,8 +5,6 @@ import { type ContactEntity, ContactPosition, type UpdateContactDto } from "@/ap
 import { toJalali } from "@/lib/utils/dateUtils";
 import type { ContactFormData, ContactTableRow } from "./types";
 
-export const ITEMS_PER_PAGE = 4;
-
 export const toTableRow = (contact: ContactEntity): ContactTableRow => ({
 	assignedToUserId: contact.assignedToUser?.fullName || "-",
 	createdAt: toJalali(contact.createdAt || ""),

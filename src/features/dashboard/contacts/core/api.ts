@@ -5,7 +5,7 @@ import type { BaseQueryParams } from "@/features/shared/factories/createApiHooks
 import { createApiHooks } from "@/features/shared/factories/createApiHooks";
 import { useContactsStore } from "./store";
 import type { ContactTableRow } from "./types";
-import { ITEMS_PER_PAGE, toTableRow } from "./utils";
+import {  toTableRow } from "./utils";
 
 const contactsService = {
 	create: async (payload: CreateContactDto): Promise<ContactTableRow> => {
@@ -18,7 +18,7 @@ const contactsService = {
 	},
 	getAll: async (params?: BaseQueryParams): Promise<ContactTableRow[]> => {
 		const page = Math.max(1, Number(params?.page ?? 1));
-		const limit = ITEMS_PER_PAGE;
+		const limit = Number(process.env.NEXT_PUBLIC_ITEMS_PER_PAGE);
 
 		const cleanParams: Record<string, any> = {
 			limit,

@@ -5,8 +5,6 @@ import type { LeadEntity, LeadSource, LeadStatus, UpdateLeadDto } from "@/api/ty
 import { toJalali } from "@/lib/utils/dateUtils";
 import type { LeadFormData, LeadTableRow } from "./types";
 
-export const ITEMS_PER_PAGE = 3;
-
 export const toTableRow = (lead: LeadEntity): LeadTableRow => ({
 	assignedToUserId: lead.assignedToUser?.fullName || "-",
 	company: lead.company || "",

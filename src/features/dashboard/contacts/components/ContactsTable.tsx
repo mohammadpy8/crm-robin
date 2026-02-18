@@ -7,7 +7,7 @@ import { useUserStore } from "@/store/useUserStore.";
 import { getContactsColumnConfig } from "../configs/table.config";
 import { useContactsQuery } from "../core/api";
 import { useContactsStore } from "../core/store";
-import { ITEMS_PER_PAGE } from "../core/utils";
+
 
 const useContactsTable = createTableHandlers<TableRow>({
   useQuery: useContactsQuery,
@@ -28,7 +28,7 @@ export function ContactsTable() {
       currentPage={state.currentPage}
       data={state.data}
       externalSelectedIds={selectedIds}
-      itemsPerPage={ITEMS_PER_PAGE}
+      itemsPerPage={Number(process.env.NEXT_PUBLIC_ITEMS_PER_PAGE)}
       loading={state.isFetching}
       multiSelect={true}
       onFilterChange={handlers.onFilterChange}

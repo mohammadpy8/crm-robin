@@ -4,13 +4,13 @@ import type { BaseQueryParams } from "@/features/shared/factories/createApiHooks
 import { createApiHooks } from "@/features/shared/factories/createApiHooks";
 import { useUsersStore } from "./store";
 import type { UpdateUserPayload, UserTableRow } from "./types";
-import { ITEMS_PER_PAGE, toTableRow } from "./utils";
+import { toTableRow } from "./utils";
 
 const usersService = {
 	create: async (payload: SignupDto): Promise<UserTableRow> => {
 		await authService.signup(payload);
 
-		// Return a temporary row since signup doesn't return the created user
+
 		return {
 			createdAt: "",
 			email: payload.email,
@@ -26,7 +26,7 @@ const usersService = {
 	},
 	getAll: async (params?: BaseQueryParams): Promise<UserTableRow[]> => {
 		const page = Math.max(1, Number(params?.page ?? 1));
-		const limit = ITEMS_PER_PAGE;
+		const limit = Number(process.env.NEXT_PUBLIC_ITEMS_PER_PAGE);
 
 		const queryParams: { page?: number; limit?: number; search?: string } = {
 			limit,

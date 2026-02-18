@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import type { FilterValue } from "@/features/shared/ui/table";
 import type { FormMode, LeadsState } from "./types";
-import { ITEMS_PER_PAGE } from "./utils";
 
 interface LeadsStore extends LeadsState {
 	queryParams: {
@@ -54,7 +53,7 @@ export const useLeadsStore = create<LeadsStore>((set) => ({
 		}),
 
 	queryParams: {
-		limit: ITEMS_PER_PAGE,
+		limit: Number(process.env.NEXT_PUBLIC_ITEMS_PER_PAGE),
 		page: 1,
 	},
 
@@ -62,7 +61,7 @@ export const useLeadsStore = create<LeadsStore>((set) => ({
 		set({
 			...initialState,
 			queryParams: {
-				limit: ITEMS_PER_PAGE,
+				limit: Number(process.env.NEXT_PUBLIC_ITEMS_PER_PAGE),
 				page: 1,
 			},
 			totalItems: 0,

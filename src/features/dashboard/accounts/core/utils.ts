@@ -5,7 +5,6 @@ import type { CompanyEntity, UpdateCompanyDto } from "@/api/types";
 import { toJalali } from "@/lib/utils/dateUtils";
 import type { AccountFormData, AccountTableRow } from "./types";
 
-export const ITEMS_PER_PAGE = 3;
 
 export const toTableRow = (company: CompanyEntity): AccountTableRow => ({
 	assignedToUserId: company.assignedToUser?.fullName || "-",

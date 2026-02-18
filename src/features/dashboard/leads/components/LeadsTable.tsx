@@ -7,7 +7,6 @@ import { useUserStore } from "@/store/useUserStore.";
 import { getLeadsColumnConfig } from "../configs/table.config";
 import { useLeadsQuery } from "../core/api";
 import { useLeadsStore } from "../core/store";
-import { ITEMS_PER_PAGE } from "../core/utils";
 
 const useLeadsTable = createTableHandlers<TableRow>({
   useQuery: useLeadsQuery,
@@ -28,7 +27,7 @@ export function LeadsTable() {
       currentPage={state.currentPage}
       data={state.data}
       externalSelectedIds={selectedIds}
-      itemsPerPage={ITEMS_PER_PAGE}
+      itemsPerPage={Number(process.env.NEXT_PUBLIC_ITEMS_PER_PAGE)}
       loading={state.isFetching}
       multiSelect={true}
       onFilterChange={handlers.onFilterChange}

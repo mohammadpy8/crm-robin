@@ -7,7 +7,6 @@ import { useRoleStore } from "@/store/useRoleStore";
 import { getUsersColumnConfig } from "../configs/table.config";
 import { useUsersQuery } from "../core/api";
 import { useUsersStore } from "../core/store";
-import { ITEMS_PER_PAGE } from "../core/utils";
 
 const useUsersTable = createTableHandlers<TableRow>({
   useQuery: useUsersQuery,
@@ -28,7 +27,7 @@ export function UsersTable() {
       currentPage={state.currentPage}
       data={state.data}
       externalSelectedIds={selectedIds}
-      itemsPerPage={ITEMS_PER_PAGE}
+      itemsPerPage={Number(process.env.NEXT_PUBLIC_ITEMS_PER_PAGE)}
       loading={state.isFetching}
       multiSelect={true}
       onFilterChange={handlers.onFilterChange}

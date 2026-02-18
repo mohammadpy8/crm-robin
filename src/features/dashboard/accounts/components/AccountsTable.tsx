@@ -7,7 +7,7 @@ import { useUserStore } from "@/store/useUserStore.";
 import { getAccountsColumnConfig } from "../configs/table.config";
 import { useAccountsQuery } from "../core/api";
 import { useAccountsStore } from "../core/store";
-import { ITEMS_PER_PAGE } from "../core/utils";
+
 
 const useAccountsTable = createTableHandlers<TableRow>({
   useQuery: useAccountsQuery,
@@ -29,7 +29,7 @@ export function AccountsTable() {
       currentPage={state.currentPage}
       data={state.data}
       externalSelectedIds={selectedIds}
-      itemsPerPage={ITEMS_PER_PAGE}
+      itemsPerPage={Number(process.env.NEXT_PUBLIC_ITEMS_PER_PAGE)}
       loading={state.isFetching}
       multiSelect={true}
       onFilterChange={handlers.onFilterChange}

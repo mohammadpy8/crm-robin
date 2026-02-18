@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import type { FilterValue } from "@/features/shared/ui/table";
 import type { FormMode, UsersState } from "./types";
-import { ITEMS_PER_PAGE } from "./utils";
 
 interface UsersStore extends UsersState {
 	queryParams: {
@@ -54,7 +53,7 @@ export const useUsersStore = create<UsersStore>((set) => ({
 		}),
 
 	queryParams: {
-		limit: ITEMS_PER_PAGE,
+		limit: Number(process.env.NEXT_PUBLIC_ITEMS_PER_PAGE),
 		page: 1,
 	},
 
@@ -62,7 +61,7 @@ export const useUsersStore = create<UsersStore>((set) => ({
 		set({
 			...initialState,
 			queryParams: {
-				limit: ITEMS_PER_PAGE,
+				limit: Number(process.env.NEXT_PUBLIC_ITEMS_PER_PAGE),
 				page: 1,
 			},
 			totalItems: 0,
