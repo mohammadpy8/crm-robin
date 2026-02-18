@@ -1,5 +1,5 @@
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@heroui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Upload, FileSpreadsheet, X } from "lucide-react";
 
 interface FileUploadModalProps {
@@ -11,6 +11,7 @@ interface FileUploadModalProps {
   description?: string;
   acceptedFormats?: string[];
   maxSizeMB?: number;
+  resetKey?: boolean;
 }
 
 export function FileUploadModal({
@@ -22,6 +23,7 @@ export function FileUploadModal({
   description,
   acceptedFormats = [".xlsx", ".xls"],
   maxSizeMB = 10,
+  resetKey,
 }: FileUploadModalProps) {
   const [file, setFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState(false);
@@ -92,6 +94,12 @@ export function FileUploadModal({
     setFile(null);
     setError("");
   };
+
+  useEffect(() => {
+    if (!resetKey) {
+      setFile(null);
+    }
+  }, [resetKey]);
 
   return (
     <Modal

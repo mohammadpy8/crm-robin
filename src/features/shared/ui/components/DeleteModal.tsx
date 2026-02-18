@@ -83,7 +83,6 @@ export function DeleteModal({
                 isLoading={isLoading}
                 onPress={() => {
                   onConfirm();
-                  onModalClose();
                 }}
                 radius='lg'
                 size='md'
